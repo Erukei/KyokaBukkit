@@ -1,0 +1,30 @@
+From a5f17c66915d79889bdb018ffaa6e0de40e6a03f Mon Sep 17 00:00:00 2001
+From: Jamie Shaw <lk@lkay.org>
+Date: Sun, 29 Jun 2014 17:01:50 +1000
+Subject: [PATCH] CORE: This is KyokaBukkit
+
+
+diff --git a/pom.xml b/pom.xml
+index b2e2002..9c92b3d 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -1,12 +1,12 @@
+ <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+-  <groupId>org.bukkit</groupId>
+-  <artifactId>craftbukkit</artifactId>
++  <groupId>com.erukei</groupId>
++  <artifactId>kyoka-server</artifactId>
+   <packaging>jar</packaging>
+   <version>1.7.9-R0.3-SNAPSHOT</version>
+-  <name>CraftBukkit</name>
+-  <url>http://www.bukkit.org</url>
++  <name>Kyoka-Server</name>
++  <url>https://github.com/Erukei/KyokaBukkit</url>
+ 
+   <properties>
+     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+-- 
+1.9.1
+
