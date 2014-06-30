@@ -1,11 +1,11 @@
-From e284004137b909de09d30bcde717e8a42494ef9b Mon Sep 17 00:00:00 2001
+From f330ff9f6e8512b1ce4e5a7abc71cbe5ca2e13e3 Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Mon, 30 Jun 2014 16:14:23 +1000
-Subject: [PATCH] CORE: Allow use of Java 8
+Subject: [PATCH] CORE: Allow use of Java 7
 
 
 diff --git a/pom.xml b/pom.xml
-index 9c92b3d..305a6da 100644
+index 9c92b3d..1faccac 100644
 --- a/pom.xml
 +++ b/pom.xml
 @@ -280,8 +280,8 @@
@@ -14,8 +14,8 @@ index 9c92b3d..305a6da 100644
          <configuration>
 -          <source>1.6</source>
 -          <target>1.6</target>
-+          <source>1.8</source>
-+          <target>1.8</target>
++          <source>1.7</source>
++          <target>1.7</target>
          </configuration>
        </plugin>
        <plugin>
