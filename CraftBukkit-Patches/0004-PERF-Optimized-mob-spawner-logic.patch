@@ -1,0 +1,120 @@
+From 64aa62baac92d9345ecb0cf97a249b9369ce361b Mon Sep 17 00:00:00 2001
+From: Christian Nielsen <professiionaal@gmail.com>
+Date: Mon, 30 Jun 2014 23:30:39 -0400
+Subject: [PATCH] PERF: Optimized mob spawner logic
+
+
+diff --git a/src/main/java/net/minecraft/server/MobSpawnerAbstract.java b/src/main/java/net/minecraft/server/MobSpawnerAbstract.java
+index 06f9b1f..1e36160 100644
+--- a/src/main/java/net/minecraft/server/MobSpawnerAbstract.java
++++ b/src/main/java/net/minecraft/server/MobSpawnerAbstract.java
+@@ -46,70 +46,51 @@ public abstract class MobSpawnerAbstract {
+     }
+ 
+     public void g() {
+-        if (this.f()) {
+-            double d0;
+-
+-            if (this.a().isStatic) {
+-                double d1 = (double) ((float) this.b() + this.a().random.nextFloat());
+-                double d2 = (double) ((float) this.c() + this.a().random.nextFloat());
+-
+-                d0 = (double) ((float) this.d() + this.a().random.nextFloat());
+-                this.a().addParticle("smoke", d1, d2, d0, 0.0D, 0.0D, 0.0D);
+-                this.a().addParticle("flame", d1, d2, d0, 0.0D, 0.0D, 0.0D);
+-                if (this.spawnDelay > 0) {
+-                    --this.spawnDelay;
+-                }
+-
+-                this.d = this.c;
+-                this.c = (this.c + (double) (1000.0F / ((float) this.spawnDelay + 200.0F))) % 360.0D;
+-            } else {
+-                if (this.spawnDelay == -1) {
+-                    this.j();
+-                }
+-
+-                if (this.spawnDelay > 0) {
+-                    --this.spawnDelay;
+-                    return;
+-                }
+-
+-                boolean flag = false;
+-
+-                for (int i = 0; i < this.spawnCount; ++i) {
+-                    Entity entity = EntityTypes.createEntityByName(this.getMobName(), this.a());
+-
+-                    if (entity == null) {
+-                        return;
+-                    }
++        if (this.spawnCount == -1) { // Kyoka
++            this.j();
++        }
+ 
+-                    int j = this.a().a(entity.getClass(), AxisAlignedBB.a((double) this.b(), (double) this.c(), (double) this.d(), (double) (this.b() + 1), (double) (this.c() + 1), (double) (this.d() + 1)).grow((double) (this.spawnRange * 2), 4.0D, (double) (this.spawnRange * 2))).size();
++        if (this.spawnDelay > 0) {
++            --this.spawnDelay;
++            return;
++        }
+ 
+-                    if (j >= this.maxNearbyEntities) {
+-                        this.j();
+-                        return;
+-                    }
++        // Kyoka start
++        if (!this.f()) {
++            this.j();
++            return;
++        }
++        // Kyoka end
++        
++        for (int i = 0; i < this.spawnCount; ++i) {
++            Entity entity = EntityTypes.createEntityByName(this.getMobName(), this.a());
+ 
+-                    d0 = (double) this.b() + (this.a().random.nextDouble() - this.a().random.nextDouble()) * (double) this.spawnRange;
+-                    double d3 = (double) (this.c() + this.a().random.nextInt(3) - 1);
+-                    double d4 = (double) this.d() + (this.a().random.nextDouble() - this.a().random.nextDouble()) * (double) this.spawnRange;
+-                    EntityInsentient entityinsentient = entity instanceof EntityInsentient ? (EntityInsentient) entity : null;
++            if (entity == null) {
++                return;
++            }
+ 
+-                    entity.setPositionRotation(d0, d3, d4, this.a().random.nextFloat() * 360.0F, 0.0F);
+-                    if (entityinsentient == null || entityinsentient.canSpawn()) {
+-                        this.a(entity);
+-                        this.a().triggerEffect(2004, this.b(), this.c(), this.d(), 0);
+-                        if (entityinsentient != null) {
+-                            entityinsentient.s();
+-                        }
++            int j = this.a().a(entity.getClass(), AxisAlignedBB.a((double) this.b(), (double) this.c(), (double) this.d(), (double) (this.b() + 1), (double) (this.c() + 1), (double) (this.d() + 1)).grow((double) (this.spawnRange * 2), 4.0D, (double) (this.spawnRange * 2))).size();
+ 
+-                        flag = true;
+-                    }
+-                }
++            if (j >= this.maxNearbyEntities) {
++                this.j();
++                return;
++            }
+ 
+-                if (flag) {
+-                    this.j();
++            double d0 = (double) this.b() + (this.a().random.nextDouble() - this.a().random.nextDouble()) * (double) this.spawnRange;
++            double d3 = (double) (this.c() + this.a().random.nextInt(3) - 1);
++            double d4 = (double) this.d() + (this.a().random.nextDouble() - this.a().random.nextDouble()) * (double) this.spawnRange;
++            EntityInsentient entityinsentient = entity instanceof EntityInsentient ? (EntityInsentient) entity : null;
++
++            entity.setPositionRotation(d0, d3, d4, this.a().random.nextFloat() * 360.0F, 0.0F);
++            if (entityinsentient == null || entityinsentient.canSpawn()) {
++                this.a(entity);
++                this.a().triggerEffect(2004, this.b(), this.c(), this.d(), 0);
++                if (entityinsentient != null) {
++                    entityinsentient.s();
+                 }
+             }
+         }
++        this.j(); // Kyoka
+     }
+ 
+     public Entity a(Entity entity) {
+-- 
+1.9.0.msysgit.0
+
