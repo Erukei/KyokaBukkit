@@ -1,0 +1,125 @@
+From a4072c83529eee185f9025c67018cd1de9b2b6dd Mon Sep 17 00:00:00 2001
+From: Jamie Shaw <lk@lkay.org>
+Date: Wed, 2 Jul 2014 22:24:50 +1000
+Subject: [PATCH] FIX: OCN relog fix
+
+
+diff --git a/src/main/java/net/minecraft/server/EntityHuman.java b/src/main/java/net/minecraft/server/EntityHuman.java
+index 7e072ea..9c6a956 100644
+--- a/src/main/java/net/minecraft/server/EntityHuman.java
++++ b/src/main/java/net/minecraft/server/EntityHuman.java
+@@ -18,6 +18,7 @@ import org.bukkit.event.player.PlayerBedEnterEvent;
+ import org.bukkit.event.player.PlayerBedLeaveEvent;
+ import org.bukkit.event.player.PlayerDropItemEvent;
+ import org.bukkit.event.player.PlayerItemConsumeEvent;
++import org.bukkit.event.player.PlayerVelocityEvent;
+ // CraftBukkit end
+ 
+ public abstract class EntityHuman extends EntityLiving implements ICommandListener {
+@@ -928,6 +929,13 @@ public abstract class EntityHuman extends EntityLiving implements ICommandListen
+                         // CraftBukkit end
+                     }
+ 
++                    // CraftBukkit start
++                    // Save the victim's velocity before they are potentially knocked back
++                    double victimMotX = entity.motX;
++                    double victimMotY = entity.motY;
++                    double victimMotZ = entity.motZ;
++                    // CraftBukkit end
++
+                     boolean flag2 = entity.damageEntity(DamageSource.playerAttack(this), f);
+ 
+                     if (flag2) {
+@@ -938,6 +946,31 @@ public abstract class EntityHuman extends EntityLiving implements ICommandListen
+                             this.setSprinting(false);
+                         }
+ 
++                        // CraftBukkit start
++                        // If the attack caused knockback, send the new velocity to the victim's client immediately,
++                        // and undo the change. Otherwise, if movement packets from the victim are processed before
++                        // the end of the tick, then friction may reduce the velocity considerably before it's sent
++                        // to the client, particularly if the victim was standing on the ground when those packets
++                        // were generated. And because this glitch is also likely to make server-side velocity very
++                        // inconsistent, we simply reverse the knockback after sending it so that KB, like most other
++                        // things, doesn't affect server velocity at all.
++                        if(entity instanceof EntityPlayer && entity.velocityChanged) {
++                            EntityPlayer attackedPlayer = (EntityPlayer) entity;
++                            PlayerVelocityEvent event = new PlayerVelocityEvent(attackedPlayer.getBukkitEntity(),
++                                                                                attackedPlayer.getBukkitEntity().getVelocity());
++                            this.world.getServer().getPluginManager().callEvent(event);
++                            if(!event.isCancelled()) {
++                                attackedPlayer.getBukkitEntity().setVelocityDirect(event.getVelocity());
++                                attackedPlayer.playerConnection.sendPacket(new PacketPlayOutEntityVelocity(attackedPlayer));
++                            }
++
++                            attackedPlayer.velocityChanged = false;
++                            attackedPlayer.motX = victimMotX;
++                            attackedPlayer.motY = victimMotY;
++                            attackedPlayer.motZ = victimMotZ;
++                        }
++                        // CraftBukkit end
++
+                         if (flag) {
+                             this.b(entity);
+                         }
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+index 8797936..20258f1 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+@@ -48,16 +48,14 @@ import org.bukkit.craftbukkit.util.CraftChatMessage;
+ import org.bukkit.craftbukkit.util.CraftMagicNumbers;
+ import org.bukkit.entity.EntityType;
+ import org.bukkit.entity.Player;
+-import org.bukkit.event.player.PlayerGameModeChangeEvent;
+-import org.bukkit.event.player.PlayerRegisterChannelEvent;
+-import org.bukkit.event.player.PlayerTeleportEvent;
+-import org.bukkit.event.player.PlayerUnregisterChannelEvent;
++import org.bukkit.event.player.*;
+ import org.bukkit.inventory.InventoryView.Property;
+ import org.bukkit.map.MapView;
+ import org.bukkit.metadata.MetadataValue;
+ import org.bukkit.plugin.Plugin;
+ import org.bukkit.plugin.messaging.StandardMessenger;
+ import org.bukkit.scoreboard.Scoreboard;
++import org.bukkit.util.Vector;
+ 
+ @DelegateDeserialization(CraftOfflinePlayer.class)
+ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -1286,6 +1284,34 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+         collection.add(new AttributeModifiable(getHandle().bb(), (new AttributeRanged("generic.maxHealth", scaledHealth ? healthScale : getMaxHealth(), 0.0D, Float.MAX_VALUE)).a("Max Health").a(true)));
+     }
+ 
++    @Override
++    public void setVelocity(Vector vel) {
++        // To be consistent with old behavior, set the velocity before firing the event
++        this.setVelocityDirect(vel);
++
++        PlayerVelocityEvent event = new PlayerVelocityEvent(this, vel.clone());
++        this.getServer().getPluginManager().callEvent(event);
++
++        if (!event.isCancelled()) {
++            // Set the velocity again in case it was changed by event handlers
++            this.setVelocityDirect(event.getVelocity());
++
++            // Send the new velocity to the player's client immediately, so it isn't affected by
++            // any movement packets from this player that may be processed before the end of the tick.
++            // Without this, player velocity changes tend to be very inconsistent.
++            getHandle().playerConnection.sendPacket(new PacketPlayOutEntityVelocity(this.getHandle()));
++        }
++
++        // Note that cancelling the event does not restore the old velocity, it only prevents
++        // the packet from sending. Again, this is to be consistent with old behavior.
++    }
++
++    public void setVelocityDirect(Vector vel) {
++        entity.motX = vel.getX();
++        entity.motY = vel.getY();
++        entity.motZ = vel.getZ();
++    }
++
+     // Kyoka start
+     private final Kyoka kyoka = new Kyoka() {
+         @Override
+-- 
+1.9.1
+
