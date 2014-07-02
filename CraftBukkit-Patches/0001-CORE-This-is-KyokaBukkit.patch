@@ -1,11 +1,11 @@
-From a5f17c66915d79889bdb018ffaa6e0de40e6a03f Mon Sep 17 00:00:00 2001
+From 6b1fbf78a3d8a3c6bcfba1163cc99312e881fd33 Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Sun, 29 Jun 2014 17:01:50 +1000
 Subject: [PATCH] CORE: This is KyokaBukkit
 
 
 diff --git a/pom.xml b/pom.xml
-index b2e2002..9c92b3d 100644
+index b2e2002..5758c7f 100644
 --- a/pom.xml
 +++ b/pom.xml
 @@ -1,12 +1,12 @@
@@ -25,6 +25,17 @@ index b2e2002..9c92b3d 100644
  
    <properties>
      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+@@ -53,8 +53,8 @@
+ 
+   <dependencies>
+     <dependency>
+-      <groupId>org.bukkit</groupId>
+-      <artifactId>bukkit</artifactId>
++      <groupId>com.erukei</groupId>
++      <artifactId>kyoka-api</artifactId>
+       <version>${project.version}</version>
+       <type>jar</type>
+       <scope>compile</scope>
 -- 
 1.9.1
 

@@ -1,0 +1,31 @@
+From bdf300ec8942dcaf9704e9b82d18dec9085a7ec6 Mon Sep 17 00:00:00 2001
+From: Jamie Shaw <lk@lkay.org>
+Date: Wed, 2 Jul 2014 15:51:33 +1000
+Subject: [PATCH] API: Allow plugins access to the player locale
+
+
+diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
+index e5155b8..df62023 100644
+--- a/src/main/java/org/bukkit/entity/Player.java
++++ b/src/main/java/org/bukkit/entity/Player.java
+@@ -1037,7 +1037,16 @@ public interface Player extends HumanEntity, Conversable, CommandSender, Offline
+     public double getHealthScale();
+ 
+     // Kyoka start
+-    public class Kyoka {}
++    public class Kyoka {
++        /**
++         * Get the player's locale.
++         * @return player's locale identifier
++         */
++        public String getLocale() {
++            throw new UnsupportedOperationException("Not implemented yet");
++        }
++
++    }
+     Kyoka kyoka();
+     // Kyoka end
+ }
+-- 
+1.9.1
+

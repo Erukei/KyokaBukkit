@@ -1,0 +1,23 @@
+From f351956c24506809c9f0af439bc7ba06b0d91077 Mon Sep 17 00:00:00 2001
+From: Jamie Shaw <lk@lkay.org>
+Date: Wed, 2 Jul 2014 15:47:05 +1000
+Subject: [PATCH] API: Skeleton
+
+
+diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
+index fe8a0bd..e5155b8 100644
+--- a/src/main/java/org/bukkit/entity/Player.java
++++ b/src/main/java/org/bukkit/entity/Player.java
+@@ -1035,4 +1035,9 @@ public interface Player extends HumanEntity, Conversable, CommandSender, Offline
+      * @see Player#setHealthScaled(boolean)
+      */
+     public double getHealthScale();
++
++    // Kyoka start
++    public class Kyoka {}
++    Kyoka kyoka();
++    // Kyoka end
+ }
+-- 
+1.9.1
+
