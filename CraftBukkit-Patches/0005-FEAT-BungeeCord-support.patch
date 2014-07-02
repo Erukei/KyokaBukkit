@@ -1,0 +1,316 @@
+From 625a615707cd150f249cc2d0bc213707442b4508 Mon Sep 17 00:00:00 2001
+From: Jamie Shaw <lk@lkay.org>
+Date: Tue, 1 Jul 2014 16:42:39 +1000
+Subject: [PATCH] FEAT: BungeeCord support
+
+
+diff --git a/src/main/java/com/erukei/kyoka/KyokaConfig.java b/src/main/java/com/erukei/kyoka/KyokaConfig.java
+index 94531cd..f3be3b9 100644
+--- a/src/main/java/com/erukei/kyoka/KyokaConfig.java
++++ b/src/main/java/com/erukei/kyoka/KyokaConfig.java
+@@ -14,8 +14,11 @@ public class KyokaConfig {
+     private static File configFile = new File("kyoka.yml");
+     private static YamlConfiguration config;
+ 
++    public static boolean bungeecord;
++
+     public static void init() {
+         config = YamlConfiguration.loadConfiguration(configFile);
++        config.options().copyDefaults(true);
+         for (Method method : KyokaConfig.class.getDeclaredMethods()) {
+             if (Modifier.isPrivate(method.getModifiers()) && method.getParameterCount() == 0 && method.getReturnType().equals(Void.TYPE)) {
+                 method.setAccessible(true);
+@@ -34,4 +37,9 @@ public class KyokaConfig {
+         }
+ 
+     }
++
++    private static void bungeecord() {
++        config.addDefault("bungeecord", false);
++        bungeecord = config.getBoolean("bungeecord");
++    }
+ }
+diff --git a/src/main/java/net/minecraft/server/HandshakeListener.java b/src/main/java/net/minecraft/server/HandshakeListener.java
+index 9cc9581..beda4e4 100644
+--- a/src/main/java/net/minecraft/server/HandshakeListener.java
++++ b/src/main/java/net/minecraft/server/HandshakeListener.java
+@@ -1,5 +1,9 @@
+ package net.minecraft.server;
+ 
++import com.erukei.kyoka.KyokaConfig;
++import com.google.gson.Gson;
++import net.minecraft.util.com.mojang.authlib.properties.Property;
++import net.minecraft.util.com.mojang.util.UUIDTypeAdapter;
+ import net.minecraft.util.io.netty.util.concurrent.GenericFutureListener;
+ 
+ // CraftBukkit start
+@@ -9,6 +13,7 @@ import java.util.HashMap;
+ 
+ public class HandshakeListener implements PacketHandshakingInListener {
+ 
++    private static final Gson gson = new Gson(); // Kyoka
+     // CraftBukkit start - add fields
+     private static final HashMap<InetAddress, Long> throttleTracker = new HashMap<InetAddress, Long>();
+     private static int throttleCounter = 0;
+@@ -73,6 +78,24 @@ public class HandshakeListener implements PacketHandshakingInListener {
+                 this.b.close(chatcomponenttext);
+             } else {
+                 this.b.a((PacketListener) (new LoginListener(this.a, this.b)));
++                // Kyoka start
++                if (KyokaConfig.bungeecord) {
++                    String[] split = packethandshakinginsetprotocol.b.split("\00");
++                    if (split.length == 3 || split.length == 4) {
++                        packethandshakinginsetprotocol.b = split[0];
++                        b.n = new java.net.InetSocketAddress(split[1], ((java.net.InetSocketAddress) b.getSocketAddress()).getPort());
++                        b.spoofedUUID = UUIDTypeAdapter.fromString(split[2]);
++                    } else {
++                        chatcomponenttext = new ChatComponentText("If you wish to use IP forwarding, please enable it in your BungeeCord config as well!");
++                        this.b.handle(new PacketLoginOutDisconnect(chatcomponenttext), new GenericFutureListener[0]);
++                        this.b.close(chatcomponenttext);
++                        return;
++                    }
++                    if (split.length == 4) {
++                        b.spoofedProfile = gson.fromJson(split[3], Property[].class);
++                    }
++                }
++                // Kyoka end
+                 ((LoginListener) this.b.getPacketListener()).hostname = packethandshakinginsetprotocol.b + ":" + packethandshakinginsetprotocol.c; // CraftBukkit - set hostname
+             }
+             break;
+diff --git a/src/main/java/net/minecraft/server/LoginListener.java b/src/main/java/net/minecraft/server/LoginListener.java
+index 8f982f1..704f1f0 100644
+--- a/src/main/java/net/minecraft/server/LoginListener.java
++++ b/src/main/java/net/minecraft/server/LoginListener.java
+@@ -9,6 +9,7 @@ import javax.crypto.SecretKey;
+ 
+ import net.minecraft.util.com.google.common.base.Charsets;
+ import net.minecraft.util.com.mojang.authlib.GameProfile;
++import net.minecraft.util.com.mojang.authlib.properties.Property;
+ import net.minecraft.util.io.netty.util.concurrent.GenericFutureListener;
+ import net.minecraft.util.org.apache.commons.lang3.Validate;
+ import org.apache.logging.log4j.LogManager;
+@@ -59,10 +60,36 @@ public class LoginListener implements PacketLoginInListener {
+         }
+     }
+ 
++    // Kyoka start
++    public void initUUID()
++    {
++        UUID uuid;
++        if (networkManager.spoofedUUID != null) {
++            uuid = networkManager.spoofedUUID;
++        } else {
++            uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + this.i.getName()).getBytes(Charsets.UTF_8));
++        }
++
++        this.i = new GameProfile(uuid, this.i.getName());
++
++        if (networkManager.spoofedProfile != null) {
++            for (Property property : networkManager.spoofedProfile) {
++                this.i.getProperties().put(property.getName(), property);
++            }
++        }
++
++        this.i = new GameProfile( uuid, this.i.getName() );
++    }
++    // Kyoka end
++
+     public void c() {
++        // Kyoka start - Moved to initUUID
++        /*
+         if (!this.i.isComplete()) {
+             this.i = this.a(this.i);
+         }
++        */
++        // Kyoka end
+ 
+         // CraftBukkit start - fire PlayerLoginEvent
+         EntityPlayer s = this.server.getPlayerList().attemptLogin(this, this.i, this.hostname);
+@@ -97,7 +124,7 @@ public class LoginListener implements PacketLoginInListener {
+             this.g = EnumProtocolState.KEY;
+             this.networkManager.handle(new PacketLoginOutEncryptionBegin(this.j, this.server.K().getPublic(), this.e), new GenericFutureListener[0]);
+         } else {
+-            this.g = EnumProtocolState.READY_TO_ACCEPT;
++            (new ThreadPlayerLookupUUID(this, "User Authenticator #" + b.incrementAndGet())).start(); // Kyoka
+         }
+     }
+ 
+diff --git a/src/main/java/net/minecraft/server/NetworkManager.java b/src/main/java/net/minecraft/server/NetworkManager.java
+index 1b080c7..114b31e 100644
+--- a/src/main/java/net/minecraft/server/NetworkManager.java
++++ b/src/main/java/net/minecraft/server/NetworkManager.java
+@@ -6,6 +6,7 @@ import javax.crypto.SecretKey;
+ 
+ import net.minecraft.util.com.google.common.collect.Queues;
+ import net.minecraft.util.com.google.common.util.concurrent.ThreadFactoryBuilder;
++import net.minecraft.util.com.mojang.authlib.properties.Property;
+ import net.minecraft.util.io.netty.channel.Channel;
+ import net.minecraft.util.io.netty.channel.ChannelFutureListener;
+ import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
+@@ -37,7 +38,11 @@ public class NetworkManager extends SimpleChannelInboundHandler {
+     private final Queue k = Queues.newConcurrentLinkedQueue();
+     private final Queue l = Queues.newConcurrentLinkedQueue();
+     private Channel m;
+-    private SocketAddress n;
++    // Kyoka start
++    public SocketAddress n;
++    public java.util.UUID spoofedUUID;
++    public Property[] spoofedProfile;
++    // Kyoka end
+     private PacketListener o;
+     private EnumProtocol p;
+     private IChatBaseComponent q;
+@@ -207,4 +212,5 @@ public class NetworkManager extends SimpleChannelInboundHandler {
+     static Channel a(NetworkManager networkmanager) {
+         return networkmanager.m;
+     }
++
+ }
+diff --git a/src/main/java/net/minecraft/server/PacketHandshakingInSetProtocol.java b/src/main/java/net/minecraft/server/PacketHandshakingInSetProtocol.java
+index 16d4765..9dd7a70 100644
+--- a/src/main/java/net/minecraft/server/PacketHandshakingInSetProtocol.java
++++ b/src/main/java/net/minecraft/server/PacketHandshakingInSetProtocol.java
+@@ -13,7 +13,7 @@ public class PacketHandshakingInSetProtocol extends Packet {
+ 
+     public void a(PacketDataSerializer packetdataserializer) throws IOException { // CraftBukkit - added throws
+         this.a = packetdataserializer.a();
+-        this.b = packetdataserializer.c(255);
++        this.b = packetdataserializer.c(Short.MAX_VALUE); // Kyoka
+         this.c = packetdataserializer.readUnsignedShort();
+         this.d = EnumProtocol.a(packetdataserializer.a());
+     }
+diff --git a/src/main/java/net/minecraft/server/ThreadPlayerLookupUUID.java b/src/main/java/net/minecraft/server/ThreadPlayerLookupUUID.java
+index 6b91be7..e967362 100644
+--- a/src/main/java/net/minecraft/server/ThreadPlayerLookupUUID.java
++++ b/src/main/java/net/minecraft/server/ThreadPlayerLookupUUID.java
+@@ -25,50 +25,19 @@ class ThreadPlayerLookupUUID extends Thread {
+         GameProfile gameprofile = LoginListener.a(this.a);
+ 
+         try {
++            // Kyoka start
++            if ( !LoginListener.c( this.a ).getOnlineMode() )
++            {
++                a.initUUID();
++                fireLoginEvents();
++                return;
++            }
++            // Kyoka end
+             String s = (new BigInteger(MinecraftEncryption.a(LoginListener.b(this.a), LoginListener.c(this.a).K().getPublic(), LoginListener.d(this.a)))).toString(16);
+ 
+             LoginListener.a(this.a, LoginListener.c(this.a).av().hasJoinedServer(new GameProfile((UUID) null, gameprofile.getName()), s));
+             if (LoginListener.a(this.a) != null) {
+-                // CraftBukkit start - fire PlayerPreLoginEvent
+-                if (!this.a.networkManager.isConnected()) {
+-                    return;
+-                }
+-
+-                String playerName = LoginListener.a(this.a).getName();
+-                java.net.InetAddress address = ((java.net.InetSocketAddress) a.networkManager.getSocketAddress()).getAddress();
+-                java.util.UUID uniqueId = LoginListener.a(this.a).getId();
+-                final org.bukkit.craftbukkit.CraftServer server = LoginListener.c(this.a).server;
+-
+-                AsyncPlayerPreLoginEvent asyncEvent = new AsyncPlayerPreLoginEvent(playerName, address, uniqueId);
+-                server.getPluginManager().callEvent(asyncEvent);
+-
+-                if (PlayerPreLoginEvent.getHandlerList().getRegisteredListeners().length != 0) {
+-                    final PlayerPreLoginEvent event = new PlayerPreLoginEvent(playerName, address, uniqueId);
+-                    if (asyncEvent.getResult() != PlayerPreLoginEvent.Result.ALLOWED) {
+-                        event.disallow(asyncEvent.getResult(), asyncEvent.getKickMessage());
+-                    }
+-                    Waitable<PlayerPreLoginEvent.Result> waitable = new Waitable<PlayerPreLoginEvent.Result>() {
+-                        @Override
+-                        protected PlayerPreLoginEvent.Result evaluate() {
+-                            server.getPluginManager().callEvent(event);
+-                            return event.getResult();
+-                        }};
+-
+-                    LoginListener.c(this.a).processQueue.add(waitable);
+-                    if (waitable.get() != PlayerPreLoginEvent.Result.ALLOWED) {
+-                        this.a.disconnect(event.getKickMessage());
+-                        return;
+-                    }
+-                } else {
+-                    if (asyncEvent.getLoginResult() != AsyncPlayerPreLoginEvent.Result.ALLOWED) {
+-                        this.a.disconnect(asyncEvent.getKickMessage());
+-                        return;
+-                    }
+-                }
+-                // CraftBukkit end
+-
+-                LoginListener.e().info("UUID of player " + LoginListener.a(this.a).getName() + " is " + LoginListener.a(this.a).getId());
+-                LoginListener.a(this.a, EnumProtocolState.READY_TO_ACCEPT);
++                fireLoginEvents(); // Kyoka
+             } else if (LoginListener.c(this.a).N()) {
+                 LoginListener.e().warn("Failed to verify username but will let them in anyway!");
+                 LoginListener.a(this.a, this.a.a(gameprofile));
+@@ -93,4 +62,48 @@ class ThreadPlayerLookupUUID extends Thread {
+             // CraftBukkit end
+         }
+     }
++
++    private void fireLoginEvents() throws Exception
++    {
++        // CraftBukkit start - fire PlayerPreLoginEvent
++        if (!this.a.networkManager.isConnected()) {
++            return;
++        }
++
++        String playerName = LoginListener.a(this.a).getName();
++        java.net.InetAddress address = ((java.net.InetSocketAddress) a.networkManager.getSocketAddress()).getAddress();
++        java.util.UUID uniqueId = LoginListener.a(this.a).getId();
++        final org.bukkit.craftbukkit.CraftServer server = LoginListener.c(this.a).server;
++
++        AsyncPlayerPreLoginEvent asyncEvent = new AsyncPlayerPreLoginEvent(playerName, address, uniqueId);
++        server.getPluginManager().callEvent(asyncEvent);
++
++        if (PlayerPreLoginEvent.getHandlerList().getRegisteredListeners().length != 0) {
++            final PlayerPreLoginEvent event = new PlayerPreLoginEvent(playerName, address, uniqueId);
++            if (asyncEvent.getResult() != PlayerPreLoginEvent.Result.ALLOWED) {
++                event.disallow(asyncEvent.getResult(), asyncEvent.getKickMessage());
++            }
++            Waitable<PlayerPreLoginEvent.Result> waitable = new Waitable<PlayerPreLoginEvent.Result>() {
++                @Override
++                protected PlayerPreLoginEvent.Result evaluate() {
++                    server.getPluginManager().callEvent(event);
++                    return event.getResult();
++                }};
++
++            LoginListener.c(this.a).processQueue.add(waitable);
++            if (waitable.get() != PlayerPreLoginEvent.Result.ALLOWED) {
++                this.a.disconnect(event.getKickMessage());
++                return;
++            }
++        } else {
++            if (asyncEvent.getLoginResult() != AsyncPlayerPreLoginEvent.Result.ALLOWED) {
++                this.a.disconnect(asyncEvent.getKickMessage());
++                return;
++            }
++        }
++        // CraftBukkit end
++
++        LoginListener.e().info("UUID of player " + LoginListener.a(this.a).getName() + " is " + LoginListener.a(this.a).getId());
++        LoginListener.a(this.a, EnumProtocolState.READY_TO_ACCEPT);
++    }
+ }
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+index 72fd7b7..39b96db 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+@@ -680,7 +680,13 @@ public final class CraftServer implements Server {
+ 
+     @Override
+     public long getConnectionThrottle() {
+-        return this.configuration.getInt("settings.connection-throttle");
++        // Kyoka start
++        if (KyokaConfig.bungeecord) {
++            return -1;
++        } else {
++            return this.configuration.getInt("settings.connection-throttle");
++        }
++        // Kyoka end
+     }
+ 
+     @Override
+-- 
+1.9.1
+
