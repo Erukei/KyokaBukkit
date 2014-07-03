@@ -1,0 +1,572 @@
+From b9e60010aa9fde64f7adc4b5e42b48e379c81b99 Mon Sep 17 00:00:00 2001
+From: Christian Nielsen <professiionaal@gmail.com>
+Date: Thu, 3 Jul 2014 02:57:00 -0400
+Subject: [PATCH] PERF: Added entity activation system
+
+
+diff --git a/src/main/java/com/erukei/kyoka/ActivationRange.java b/src/main/java/com/erukei/kyoka/ActivationRange.java
+new file mode 100644
+index 0000000..8cf048a
+--- /dev/null
++++ b/src/main/java/com/erukei/kyoka/ActivationRange.java
+@@ -0,0 +1,241 @@
++package com.erukei.kyoka;
++
++import java.util.ArrayList;
++import java.util.List;
++import net.minecraft.server.AxisAlignedBB;
++import net.minecraft.server.Chunk;
++import net.minecraft.server.Entity;
++import net.minecraft.server.EntityAmbient;
++import net.minecraft.server.EntityAnimal;
++import net.minecraft.server.EntityArrow;
++import net.minecraft.server.EntityComplexPart;
++import net.minecraft.server.EntityCreature;
++import net.minecraft.server.EntityEnderCrystal;
++import net.minecraft.server.EntityEnderDragon;
++import net.minecraft.server.EntityFireball;
++import net.minecraft.server.EntityFireworks;
++import net.minecraft.server.EntityHuman;
++import net.minecraft.server.EntityLiving;
++import net.minecraft.server.EntityMonster;
++import net.minecraft.server.EntityProjectile;
++import net.minecraft.server.EntitySheep;
++import net.minecraft.server.EntitySlime;
++import net.minecraft.server.EntityTNTPrimed;
++import net.minecraft.server.EntityVillager;
++import net.minecraft.server.EntityWeather;
++import net.minecraft.server.EntityWither;
++import net.minecraft.server.MathHelper;
++import net.minecraft.server.MinecraftServer;
++import net.minecraft.server.World;
++import org.bukkit.Bukkit;
++
++public class ActivationRange {
++
++    public static int FREQUENCY = 10;
++
++    static AxisAlignedBB maxBB = AxisAlignedBB.a(0, 0, 0, 0, 0, 0);
++    static AxisAlignedBB miscBB = AxisAlignedBB.a(0, 0, 0, 0, 0, 0);
++    static AxisAlignedBB animalBB = AxisAlignedBB.a(0, 0, 0, 0, 0, 0);
++    static AxisAlignedBB monsterBB = AxisAlignedBB.a(0, 0, 0, 0, 0, 0);
++
++    /**
++     * Initializes an entities type on construction to specify what group this
++     * entity is in for activation ranges.
++     *
++     * @param entity
++     * @return group id
++     */
++    public static byte initializeEntityActivationType(Entity entity) {
++        if (entity instanceof EntityMonster || entity instanceof EntitySlime) {
++            return 1; // Monster
++        } else if (entity instanceof EntityCreature || entity instanceof EntityAmbient) {
++            return 2; // Animal
++        } else {
++            return 3; // Misc
++        }
++    }
++
++    /**
++     * These entities are excluded from Activation range checks.
++     *
++     * @param entity
++     * @return boolean If it should always tick.
++     */
++    public static boolean initializeEntityActivationState(Entity entity) {
++        if ((entity.activationType == 3 && KyokaConfig.miscActivationRange == 0)
++                || (entity.activationType == 2 && KyokaConfig.animalActivationRange == 0)
++                || (entity.activationType == 1 && KyokaConfig.monsterActivationRange == 0)
++                || entity instanceof EntityHuman
++                || entity instanceof EntityArrow
++                || entity instanceof EntityProjectile
++                || entity instanceof EntityEnderDragon
++                || entity instanceof EntityComplexPart
++                || entity instanceof EntityWither
++                || entity instanceof EntityFireball
++                || entity instanceof EntityWeather
++                || entity instanceof EntityTNTPrimed
++                || entity instanceof EntityEnderCrystal
++                || entity instanceof EntityFireworks) {
++            return true;
++        }
++
++        return false;
++    }
++
++    /**
++     * Utility method to grow an AABB without creating a new AABB or touching
++     * the pool, so we can re-use ones we have.
++     *
++     * @param target
++     * @param source
++     * @param x
++     * @param y
++     * @param z
++     */
++    public static void growBB(AxisAlignedBB target, AxisAlignedBB source, int x, int y, int z) {
++        target.a = source.a - x;
++        target.b = source.b - y;
++        target.c = source.c - z;
++        target.d = source.d + x;
++        target.e = source.e + y;
++        target.f = source.f + z;
++    }
++
++    /**
++     * Find what entities are in range of the players in the world and set
++     * active if in range.
++     *
++     * @param world
++     */
++    public static void activateEntities(World world) {
++        if (MinecraftServer.currentTick % FREQUENCY == 0) {
++            final int miscActivationRange = KyokaConfig.miscActivationRange;
++            final int animalActivationRange = KyokaConfig.animalActivationRange;
++            final int monsterActivationRange = KyokaConfig.monsterActivationRange;
++
++            int maxRange = Math.max(monsterActivationRange, animalActivationRange);
++            maxRange = Math.max(maxRange, miscActivationRange);
++            maxRange = Math.min((Bukkit.getViewDistance() << 4) - 8, maxRange);
++
++            for (Entity player : new ArrayList<Entity>(world.players)) {
++
++                player.activatedTick = MinecraftServer.currentTick;
++                growBB(maxBB, player.boundingBox, maxRange, maxRange, maxRange);
++                growBB(miscBB, player.boundingBox, miscActivationRange, miscActivationRange, miscActivationRange);
++                growBB(animalBB, player.boundingBox, animalActivationRange, animalActivationRange, animalActivationRange);
++                growBB(monsterBB, player.boundingBox, monsterActivationRange, monsterActivationRange, monsterActivationRange);
++
++                int i = MathHelper.floor(maxBB.a / 16.0D);
++                int j = MathHelper.floor(maxBB.d / 16.0D);
++                int k = MathHelper.floor(maxBB.c / 16.0D);
++                int l = MathHelper.floor(maxBB.f / 16.0D);
++
++                for (int i1 = i; i1 <= j; ++i1) {
++                    for (int j1 = k; j1 <= l; ++j1) {
++                        if (world.getWorld().isChunkLoaded(i1, j1)) {
++                            activateChunkEntities(world.getChunkAt(i1, j1));
++                        }
++                    }
++                }
++            }
++        }
++    }
++
++    /**
++     * Checks for the activation state of all entities in this chunk.
++     *
++     * @param chunk
++     */
++    private static void activateChunkEntities(Chunk chunk) {
++        for (List<Entity> slice : chunk.entitySlices) {
++            for (Entity entity : slice) {
++                if (entity.activatedTick - MinecraftServer.currentTick < FREQUENCY) {
++                    if (entity.defaultActivationState || checkEntityImmunities(entity)) {
++                        entity.activatedTick = MinecraftServer.currentTick + FREQUENCY;
++                        continue;
++                    }
++                    switch (entity.activationType) {
++                        case 1:
++                            if (monsterBB.b(entity.boundingBox)) {
++                        entity.activatedTick = MinecraftServer.currentTick + FREQUENCY;
++                            }
++                            break;
++                        case 2:
++                            if (animalBB.b(entity.boundingBox)) {
++                        entity.activatedTick = MinecraftServer.currentTick + FREQUENCY;
++                            }
++                            break;
++                        case 3:
++                        default:
++                            if (miscBB.b(entity.boundingBox)) {
++                        entity.activatedTick = MinecraftServer.currentTick + FREQUENCY;
++                            }
++                    }
++                }
++            }
++        }
++    }
++
++    /**
++     * If an entity is not in range, do some more checks to see if we should
++     * give it a shot.
++     *
++     * @param entity
++     * @return
++     */
++    public static boolean checkEntityImmunities(Entity entity) {
++        // quick checks.
++        if (entity.inWater /* isInWater */ || entity.fireTicks > 0) {
++            return true;
++        }
++        if (!entity.onGround || entity.passenger != null
++                || entity.vehicle != null) {
++            return true;
++        }
++        // special cases.
++        if (entity instanceof EntityLiving) {
++            EntityLiving living = (EntityLiving) entity;
++            if (living.attackTicks > 0 || living.effects.size() > 0) {
++                return true;
++            }
++            if (entity instanceof EntityCreature && ((EntityCreature) entity).target != null) {
++                return true;
++            }
++            if (entity instanceof EntityVillager && ((EntityVillager) entity).bY() /* Getter for first boolean */) {
++                return true;
++            }
++            if (entity instanceof EntityAnimal) {
++                EntityAnimal animal = (EntityAnimal) entity;
++                if (animal.ce() /*love*/) {
++                    return true;
++                }
++                if (entity instanceof EntitySheep && ((EntitySheep) entity).isSheared()) {
++                    return true;
++                }
++            }
++        }
++        return false;
++    }
++
++    /**
++     * Checks if the entity is active for this tick.
++     *
++     * @param entity
++     * @return
++     */
++    public static boolean checkIfActive(Entity entity) {
++        boolean isActive = entity.activatedTick >= MinecraftServer.currentTick || entity.defaultActivationState;
++
++        // Should this entity tick?
++        if (!isActive && entity.ticksLived % 20 == 0) {
++            isActive = true;
++        }
++        int x = MathHelper.floor(entity.locX);
++        int z = MathHelper.floor(entity.locZ);
++        // Make sure not on edge of unloaded chunk
++        if (isActive && !entity.world.areChunksLoaded(x, 0, z, 16)) {
++            isActive = false;
++        }
++        return isActive;
++    }
++}
+diff --git a/src/main/java/com/erukei/kyoka/KyokaConfig.java b/src/main/java/com/erukei/kyoka/KyokaConfig.java
+index f3be3b9..9ea0448 100644
+--- a/src/main/java/com/erukei/kyoka/KyokaConfig.java
++++ b/src/main/java/com/erukei/kyoka/KyokaConfig.java
+@@ -15,6 +15,9 @@ public class KyokaConfig {
+     private static YamlConfiguration config;
+ 
+     public static boolean bungeecord;
++    public static int animalActivationRange;
++    public static int monsterActivationRange;
++    public static int miscActivationRange;
+ 
+     public static void init() {
+         config = YamlConfiguration.loadConfiguration(configFile);
+@@ -42,4 +45,13 @@ public class KyokaConfig {
+         config.addDefault("bungeecord", false);
+         bungeecord = config.getBoolean("bungeecord");
+     }
++
++    private static void entityActivation() {
++        config.addDefault("entity-activation-range.animals", 32);
++        config.addDefault("entity-activation-range.monsters", 32);
++        config.addDefault("entity-activation-range.misc", 16);
++        animalActivationRange = config.getInt("entity-activation-range.animals");
++        monsterActivationRange = config.getInt("entity-activation-range.monsters");
++        miscActivationRange = config.getInt("entity-activation-range.misc");
++    }
+ }
+diff --git a/src/main/java/net/minecraft/server/Entity.java b/src/main/java/net/minecraft/server/Entity.java
+index 7b97576..28673df 100644
+--- a/src/main/java/net/minecraft/server/Entity.java
++++ b/src/main/java/net/minecraft/server/Entity.java
+@@ -1,32 +1,31 @@
+ package net.minecraft.server;
+ 
++import com.erukei.kyoka.ActivationRange;
+ import java.util.List;
+ import java.util.Random;
+ import java.util.UUID;
+ import java.util.concurrent.Callable;
+-
+-// CraftBukkit start
+ import org.bukkit.Bukkit;
+ import org.bukkit.Location;
+ import org.bukkit.Server;
+ import org.bukkit.TravelAgent;
+ import org.bukkit.block.BlockFace;
++import org.bukkit.craftbukkit.CraftWorld;
++import org.bukkit.craftbukkit.entity.CraftEntity;
++import org.bukkit.craftbukkit.entity.CraftPlayer;
++import org.bukkit.craftbukkit.event.CraftEventFactory;
+ import org.bukkit.entity.Hanging;
+ import org.bukkit.entity.LivingEntity;
+ import org.bukkit.entity.Painting;
+ import org.bukkit.entity.Vehicle;
+ import org.bukkit.event.entity.EntityCombustByEntityEvent;
++import org.bukkit.event.entity.EntityCombustEvent;
++import org.bukkit.event.entity.EntityPortalEvent;
+ import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+ import org.bukkit.event.painting.PaintingBreakByEntityEvent;
+ import org.bukkit.event.vehicle.VehicleBlockCollisionEvent;
+ import org.bukkit.event.vehicle.VehicleEnterEvent;
+ import org.bukkit.event.vehicle.VehicleExitEvent;
+-import org.bukkit.craftbukkit.CraftWorld;
+-import org.bukkit.craftbukkit.entity.CraftEntity;
+-import org.bukkit.craftbukkit.entity.CraftPlayer;
+-import org.bukkit.craftbukkit.event.CraftEventFactory;
+-import org.bukkit.event.entity.EntityCombustEvent;
+-import org.bukkit.event.entity.EntityPortalEvent;
+ import org.bukkit.plugin.PluginManager;
+ // CraftBukkit end
+ 
+@@ -89,7 +88,7 @@ public abstract class Entity {
+     public int ticksLived;
+     public int maxFireTicks;
+     public int fireTicks; // CraftBukkit - private -> public
+-    protected boolean inWater;
++    public boolean inWater; // Kyoka - protected -> public
+     public int noDamageTicks;
+     private boolean justCreated;
+     protected boolean fireProof;
+@@ -113,6 +112,14 @@ public abstract class Entity {
+     public boolean valid; // CraftBukkit
+     public org.bukkit.projectiles.ProjectileSource projectileSource; // CraftBukkit - For projectiles only
+ 
++    // Kyoka start
++    public final byte activationType = ActivationRange.initializeEntityActivationType(this);
++    public final boolean defaultActivationState;
++    public long activatedTick = MinecraftServer.currentTick + 20;
++
++    public void inactiveTick() {}
++    // Kyoka end
++
+     public int getId() {
+         return this.id;
+     }
+@@ -138,7 +145,12 @@ public abstract class Entity {
+         this.setPosition(0.0D, 0.0D, 0.0D);
+         if (world != null) {
+             this.dimension = world.worldProvider.dimension;
++            // Kyoka start
++            this.defaultActivationState = ActivationRange.initializeEntityActivationState(this);
++        } else {
++            this.defaultActivationState = false;
+         }
++        // Kyoka end
+ 
+         this.datawatcher = new DataWatcher(this);
+         this.datawatcher.a(0, Byte.valueOf((byte) 0));
+diff --git a/src/main/java/net/minecraft/server/EntityAgeable.java b/src/main/java/net/minecraft/server/EntityAgeable.java
+index 36ed831..cbcfb65 100644
+--- a/src/main/java/net/minecraft/server/EntityAgeable.java
++++ b/src/main/java/net/minecraft/server/EntityAgeable.java
+@@ -6,6 +6,25 @@ public abstract class EntityAgeable extends EntityCreature {
+     private float bq;
+     public boolean ageLocked = false; // CraftBukkit
+ 
++    // Kyoka start
++    @Override
++    public void inactiveTick() {
++        super.inactiveTick();
++        if (this.world.isStatic || this.ageLocked) {
++            this.a(this.isBaby());
++        } else {
++            int i = this.getAge();
++            if (i < 0) {
++                ++i;
++                this.setAge(i);
++            } else if (i > 0) {
++                --i;
++                this.setAge(i);
++            }
++        }
++    }
++    // Kyoka end
++
+     public EntityAgeable(World world) {
+         super(world);
+     }
+diff --git a/src/main/java/net/minecraft/server/EntityArrow.java b/src/main/java/net/minecraft/server/EntityArrow.java
+index 3628774..6f8d186 100644
+--- a/src/main/java/net/minecraft/server/EntityArrow.java
++++ b/src/main/java/net/minecraft/server/EntityArrow.java
+@@ -15,7 +15,7 @@ public class EntityArrow extends Entity implements IProjectile {
+     private int f = -1;
+     private Block g;
+     private int h;
+-    private boolean inGround;
++    public boolean inGround = false; // Kyoka - private -> public
+     public int fromPlayer;
+     public int shake;
+     public Entity shooter;
+@@ -24,6 +24,16 @@ public class EntityArrow extends Entity implements IProjectile {
+     private double damage = 2.0D;
+     public int knockbackStrength; // CraftBukkit - private -> public
+ 
++    // Kyoka start
++    @Override
++    public void inactiveTick() {
++        if (this.inGround) {
++            this.at += 19;
++        }
++        super.inactiveTick();
++    }
++    // Kyoka end
++
+     public EntityArrow(World world) {
+         super(world);
+         this.j = 10.0D;
+diff --git a/src/main/java/net/minecraft/server/EntityFireworks.java b/src/main/java/net/minecraft/server/EntityFireworks.java
+index a228a2c..6309e9f 100644
+--- a/src/main/java/net/minecraft/server/EntityFireworks.java
++++ b/src/main/java/net/minecraft/server/EntityFireworks.java
+@@ -5,6 +5,14 @@ public class EntityFireworks extends Entity {
+     private int ticksFlown;
+     public int expectedLifespan; // CraftBukkit - private -> public
+ 
++    // Kyoka start
++    @Override
++    public void inactiveTick() {
++        this.ticksFlown += 19;
++        super.inactiveTick();
++    }
++    // Kyoka end
++
+     public EntityFireworks(World world) {
+         super(world);
+         this.a(0.25F, 0.25F);
+diff --git a/src/main/java/net/minecraft/server/EntityLiving.java b/src/main/java/net/minecraft/server/EntityLiving.java
+index a5b97fb..103cfe7 100644
+--- a/src/main/java/net/minecraft/server/EntityLiving.java
++++ b/src/main/java/net/minecraft/server/EntityLiving.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.server;
+ 
++import com.erukei.kyoka.ActivationRange;
+ import java.util.Collection;
+ import java.util.HashMap;
+ import java.util.Iterator;
+@@ -82,6 +83,13 @@ public abstract class EntityLiving extends Entity {
+     ArrayList<org.bukkit.inventory.ItemStack> drops = null;
+     // CraftBukkit end
+ 
++    // Kyoka start
++    public void inactiveTick() {
++        super.inactiveTick();
++        ++this.aU;
++    }
++    // Kyoka end
++
+     public EntityLiving(World world) {
+         super(world);
+         this.aC();
+@@ -679,6 +687,7 @@ public abstract class EntityLiving extends Entity {
+                     this.noDamageTicks = this.maxNoDamageTicks;
+                     // CraftBukkit end
+                     this.hurtTicks = this.ay = 10;
++                    this.activatedTick = MinecraftServer.currentTick + this.maxNoDamageTicks * 2;
+                 }
+ 
+                 this.az = 0.0F;
+@@ -1545,6 +1554,12 @@ public abstract class EntityLiving extends Entity {
+     protected void bm() {}
+ 
+     protected void bn() {
++        // Kyoka start
++        if (!ActivationRange.checkIfActive(this)) {
++            return;
++        }
++        // Kyoka end
++
+         List list = this.world.getEntities(this, this.boundingBox.grow(0.20000000298023224D, 0.0D, 0.20000000298023224D));
+ 
+         if (this.R() && list != null && !list.isEmpty()) { // Kyoka
+@@ -1558,7 +1573,7 @@ public abstract class EntityLiving extends Entity {
+                 }
+                 // CraftBukkit end
+ 
+-                if (entity.R()) {
++                if (entity.R() && ActivationRange.checkIfActive(entity)) { // Kyoka
+                     this.o(entity);
+                 }
+             }
+diff --git a/src/main/java/net/minecraft/server/World.java b/src/main/java/net/minecraft/server/World.java
+index 7148f1e..fbb3b2b 100644
+--- a/src/main/java/net/minecraft/server/World.java
++++ b/src/main/java/net/minecraft/server/World.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.server;
+ 
++import com.erukei.kyoka.ActivationRange;
+ import java.util.ArrayList;
+ import java.util.Calendar;
+ import java.util.Collection;
+@@ -10,21 +11,19 @@ import java.util.Random;
+ import java.util.Set;
+ import java.util.UUID;
+ import java.util.concurrent.Callable;
+-
+-// CraftBukkit start
+ import org.bukkit.Bukkit;
+ import org.bukkit.block.BlockState;
+-import org.bukkit.craftbukkit.util.CraftMagicNumbers;
+-import org.bukkit.craftbukkit.util.LongHashSet;
+-import org.bukkit.generator.ChunkGenerator;
+ import org.bukkit.craftbukkit.CraftServer;
+ import org.bukkit.craftbukkit.CraftWorld;
+ import org.bukkit.craftbukkit.event.CraftEventFactory;
++import org.bukkit.craftbukkit.util.CraftMagicNumbers;
++import org.bukkit.craftbukkit.util.LongHashSet;
+ import org.bukkit.event.block.BlockCanBuildEvent;
+ import org.bukkit.event.block.BlockPhysicsEvent;
+ import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
+-import org.bukkit.event.weather.WeatherChangeEvent;
+ import org.bukkit.event.weather.ThunderChangeEvent;
++import org.bukkit.event.weather.WeatherChangeEvent;
++import org.bukkit.generator.ChunkGenerator;
+ // CraftBukkit end
+ 
+ public abstract class World implements IBlockAccess {
+@@ -1262,6 +1261,7 @@ public abstract class World implements IBlockAccess {
+         this.f.clear();
+         this.methodProfiler.c("regular");
+ 
++        ActivationRange.activateEntities(this); // Kyoka
+         // CraftBukkit start - Use field for loop variable
+         for (this.tickPosition = 0; this.tickPosition < this.entityList.size(); ++this.tickPosition) {
+             entity = (Entity) this.entityList.get(this.tickPosition);
+@@ -1400,9 +1400,12 @@ public abstract class World implements IBlockAccess {
+         int j = MathHelper.floor(entity.locZ);
+         byte b0 = 32;
+ 
+-        // CraftBukkit start - Use neighbor cache instead of looking up
+-        Chunk startingChunk = this.getChunkIfLoaded(i >> 4, j >> 4);
+-        if (!flag || (startingChunk != null && startingChunk.areNeighborsLoaded(2)) /* this.b(i - b0, 0, j - b0, i + b0, 0, j + b0) */) {
++        // Kyoka start
++        if (!ActivationRange.checkIfActive(entity)) {
++            entity.ticksLived++;
++            entity.inactiveTick();
++        } else {
++            // Kyoka end
+             // CraftBukkit end
+             entity.S = entity.locX;
+             entity.T = entity.locY;
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+index 20258f1..4f858fd 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+@@ -1,7 +1,6 @@
+ package org.bukkit.craftbukkit.entity;
+ 
+ import com.google.common.collect.ImmutableSet;
+-import com.google.common.collect.MapMaker;
+ 
+ import java.io.ByteArrayOutputStream;
+ import java.io.IOException;
+-- 
+1.9.0.msysgit.0
+
