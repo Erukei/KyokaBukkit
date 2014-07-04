@@ -1,0 +1,211 @@
+From 1b8eeaa896efaa134783193f91075e1dd8efd2ce Mon Sep 17 00:00:00 2001
+From: Jamie Shaw <lk@lkay.org>
+Date: Thu, 3 Jul 2014 20:16:04 +1000
+Subject: [PATCH] API: Fake name API
+
+
+diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
+index 1eaf92d..8f156b4 100644
+--- a/src/main/java/org/bukkit/Bukkit.java
++++ b/src/main/java/org/bukkit/Bukkit.java
+@@ -747,4 +747,27 @@ public final class Bukkit {
+     public static UnsafeValues getUnsafe() {
+         return server.getUnsafe();
+     }
++
++    // Kyoka start
++    /**
++     * @see Server#getPlayer(String, CommandSender)
++     */
++    public static Player getPlayer(String name, CommandSender viewer) {
++        return server.getPlayer(name, viewer);
++    }
++
++    /**
++     * @see Server#getPlayerExact(String, CommandSender)
++     */
++    public static Player getPlayerExact(String name, CommandSender viewer) {
++        return server.getPlayerExact(name, viewer);
++    }
++
++    /**
++     * @see Server#matchPlayer(String, CommandSender)
++     */
++    public static List<Player> matchPlayer(String name, CommandSender viewer) {
++        return server.matchPlayer(name, viewer);
++    }
++    // Kyoka end
+ }
+diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
+index 362c2c4..504f61f 100644
+--- a/src/main/java/org/bukkit/Server.java
++++ b/src/main/java/org/bukkit/Server.java
+@@ -350,8 +350,24 @@ public interface Server extends PluginMessageRecipient {
+      */
+     public Player getPlayer(UUID id);
+ 
++    // Kyoka start
++    /**
++     * Fake name aware version of {@link #getPlayer(String)}
++     */
++    public Player getPlayer(String name, CommandSender viewer);
++
++    /**
++     * Fake name aware version of {@link #getPlayerExact(String)}
++     */
++    public Player getPlayerExact(String name, CommandSender viewer);
++
++    /**
++     * Fake name aware version of {@link #matchPlayer(String)}
++     */
++    public List<Player> matchPlayer(String name, CommandSender viewer);
++    // Kyoka end
++
+     /**
+-     * Gets the plugin manager for interfacing with plugins.
+      *
+      * @return a plugin manager for this Server instance
+      */
+diff --git a/src/main/java/org/bukkit/command/Command.java b/src/main/java/org/bukkit/command/Command.java
+index 87c33d9..5feac24 100644
+--- a/src/main/java/org/bukkit/command/Command.java
++++ b/src/main/java/org/bukkit/command/Command.java
+@@ -90,7 +90,7 @@ public abstract class Command {
+ 
+         ArrayList<String> matchedPlayers = new ArrayList<String>();
+         for (Player player : sender.getServer().getOnlinePlayers()) {
+-            String name = player.getName();
++            String name = player.getName(sender); // Kyoka
+             if ((senderPlayer == null || senderPlayer.canSee(player)) && StringUtil.startsWithIgnoreCase(name, lastWord)) {
+                 matchedPlayers.add(name);
+             }
+diff --git a/src/main/java/org/bukkit/command/CommandSender.java b/src/main/java/org/bukkit/command/CommandSender.java
+index f2b0769..91e627a 100644
+--- a/src/main/java/org/bukkit/command/CommandSender.java
++++ b/src/main/java/org/bukkit/command/CommandSender.java
+@@ -34,8 +34,11 @@ public interface CommandSender extends Permissible {
+     public String getName();
+ 
+     // Kyoka start
+-    public class Kyoka {}
+-    Kyoka kyoka();
++    /**
++     * Return this sender's name as viewed by the given sender. Used by
++     * {@link org.bukkit.entity.Player}s to support fake names.
++     */
++    public String getName(CommandSender viewer);
+     // Kyoka end
+ 
+ }
+diff --git a/src/main/java/org/bukkit/command/defaults/ListCommand.java b/src/main/java/org/bukkit/command/defaults/ListCommand.java
+index eb8a6a9..b232895 100644
+--- a/src/main/java/org/bukkit/command/defaults/ListCommand.java
++++ b/src/main/java/org/bukkit/command/defaults/ListCommand.java
+@@ -35,7 +35,7 @@ public class ListCommand extends VanillaCommand {
+                 online.append(", ");
+             }
+ 
+-            online.append(player.getDisplayName());
++            online.append(player.kyoka().getDisplayName(sender instanceof Player ? (Player) sender : null)); // Kyoka
+         }
+ 
+         sender.sendMessage("There are " + players.size() + "/" + Bukkit.getMaxPlayers() + " players online:\n" + online.toString());
+diff --git a/src/main/java/org/bukkit/command/defaults/TellCommand.java b/src/main/java/org/bukkit/command/defaults/TellCommand.java
+index 287f49f..f3a9e60 100644
+--- a/src/main/java/org/bukkit/command/defaults/TellCommand.java
++++ b/src/main/java/org/bukkit/command/defaults/TellCommand.java
+@@ -24,7 +24,10 @@ public class TellCommand extends VanillaCommand {
+             return false;
+         }
+ 
+-        Player player = Bukkit.getPlayerExact(args[0]);
++        // Kyoka start
++        Player viewer = sender instanceof Player ? (Player) sender : null;
++        Player player = Bukkit.getPlayerExact(args[0], viewer);
++        // Kyoka end
+ 
+         // If a player is hidden from the sender pretend they are offline
+         if (player == null || (sender instanceof Player && !((Player) sender).canSee(player))) {
+diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
+index 717921f..c16639e 100644
+--- a/src/main/java/org/bukkit/entity/Player.java
++++ b/src/main/java/org/bukkit/entity/Player.java
+@@ -1063,6 +1063,75 @@ public interface Player extends HumanEntity, Conversable, CommandSender, Offline
+         public void setCollidesWithEntities(boolean shouldCollide) {
+             throw new UnsupportedOperationException("Not implemented yet.");
+         }
++
++        /**
++         * Set a fake name for this player when viewed by the given player.
++         * If the name is null then the fake name is cleared.
++         */
++        public void setFakeName(CommandSender viewer, String name) {
++            throw new UnsupportedOperationException("Not implemented yet.");
++        }
++        /**
++         * Return this player's fake name for the given viewer,
++         * or null if no fake name is set for that viewer
++         */
++        public String getFakeName(CommandSender viewer) {
++            throw new UnsupportedOperationException("Not implemented yet.");
++        }
++        /**
++         * Test if this player has a fake name set for the given viewer
++         */
++        public boolean hasFakeName(CommandSender viewer) {
++            throw new UnsupportedOperationException("Not implemented yet.");
++        }
++        /**
++         * Clear this player's fake names for all viewers
++         */
++        public void clearFakeNames() {
++            throw new UnsupportedOperationException("Not implemented yet.");
++        }
++
++        /**
++         * Set a fake display name for this player when viewed by the given player.
++         * If the name is null then the fake name is cleared.
++         */
++        public void setFakeDisplayName(CommandSender viewer, String name) {
++            throw new UnsupportedOperationException("Not implemented yet.");
++        }
++        /**
++         * Return this player's fake display name for the given viewer,
++         * or null if no fake name is set for that viewer
++         */
++        public String getFakeDisplayName(CommandSender viewer) {
++            throw new UnsupportedOperationException("Not implemented yet.");
++        }
++
++        /**
++         * Test if this player has a fake display name set for the given viewer
++         */
++        public boolean hasFakeDisplayName(CommandSender viewer) {
++            throw new UnsupportedOperationException("Not implemented yet.");
++        }
++        /**
++         * Clear this player's fake display names for all viewers
++         */
++        public void clearFakeDisplayNames() {
++            throw new UnsupportedOperationException("Not implemented yet.");
++        }
++
++        /**
++         * Return this player's list name as viewed by the given player, fake or not
++         */
++        public String getPlayerListName(CommandSender viewer) {
++            throw new UnsupportedOperationException("Not implemented yet.");
++        }
++
++        /**
++         * Return this player's display name as viewed by the given player, fake or not
++         */
++        public String getDisplayName(CommandSender viewer) {
++            throw new UnsupportedOperationException("Not implemented yet.");
++        }
+     }
+     Kyoka kyoka();
+     // Kyoka end
+-- 
+1.9.1
+

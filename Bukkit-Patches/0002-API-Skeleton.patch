@@ -1,9 +1,34 @@
-From f351956c24506809c9f0af439bc7ba06b0d91077 Mon Sep 17 00:00:00 2001
+From f7a36aa91213601cb4fd3366e436a08cf1c5f3ff Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Wed, 2 Jul 2014 15:47:05 +1000
 Subject: [PATCH] API: Skeleton
 
 
+diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
+index e14e9f1..362c2c4 100644
+--- a/src/main/java/org/bukkit/Server.java
++++ b/src/main/java/org/bukkit/Server.java
+@@ -916,4 +916,5 @@ public interface Server extends PluginMessageRecipient {
+      */
+     @Deprecated
+     UnsafeValues getUnsafe();
++
+ }
+diff --git a/src/main/java/org/bukkit/command/CommandSender.java b/src/main/java/org/bukkit/command/CommandSender.java
+index 148756b..f2b0769 100644
+--- a/src/main/java/org/bukkit/command/CommandSender.java
++++ b/src/main/java/org/bukkit/command/CommandSender.java
+@@ -32,4 +32,10 @@ public interface CommandSender extends Permissible {
+      * @return Name of the sender
+      */
+     public String getName();
++
++    // Kyoka start
++    public class Kyoka {}
++    Kyoka kyoka();
++    // Kyoka end
++
+ }
 diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
 index fe8a0bd..e5155b8 100644
 --- a/src/main/java/org/bukkit/entity/Player.java

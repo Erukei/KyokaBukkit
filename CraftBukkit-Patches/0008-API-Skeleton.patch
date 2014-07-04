@@ -1,4 +1,4 @@
-From 974323e41f6d79c1068c1b8df34be517ff45015c Mon Sep 17 00:00:00 2001
+From bea5de70cf146edc819860eef3746d05fa159fcc Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Wed, 2 Jul 2014 20:49:37 +1000
 Subject: [PATCH] API: Skeleton

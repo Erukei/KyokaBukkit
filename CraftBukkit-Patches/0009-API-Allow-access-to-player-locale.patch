@@ -1,4 +1,4 @@
-From 78ba440363b56d07a178338792b26225833cef04 Mon Sep 17 00:00:00 2001
+From 7249870eede3f1b87547f062c06cf5a8864b6e8d Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Wed, 2 Jul 2014 20:51:56 +1000
 Subject: [PATCH] API: Allow access to player locale

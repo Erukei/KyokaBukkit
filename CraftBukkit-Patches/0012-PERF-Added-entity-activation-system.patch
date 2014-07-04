@@ -1,4 +1,4 @@
-From b9e60010aa9fde64f7adc4b5e42b48e379c81b99 Mon Sep 17 00:00:00 2001
+From cdde5060dc0cd68fd738136c94ad8d7a555db829 Mon Sep 17 00:00:00 2001
 From: Christian Nielsen <professiionaal@gmail.com>
 Date: Thu, 3 Jul 2014 02:57:00 -0400
 Subject: [PATCH] PERF: Added entity activation system
@@ -440,7 +440,7 @@ index a228a2c..6309e9f 100644
          super(world);
          this.a(0.25F, 0.25F);
 diff --git a/src/main/java/net/minecraft/server/EntityLiving.java b/src/main/java/net/minecraft/server/EntityLiving.java
-index a5b97fb..103cfe7 100644
+index 095a97f..a64da14 100644
 --- a/src/main/java/net/minecraft/server/EntityLiving.java
 +++ b/src/main/java/net/minecraft/server/EntityLiving.java
 @@ -1,5 +1,6 @@
@@ -484,7 +484,7 @@ index a5b97fb..103cfe7 100644
 +
          List list = this.world.getEntities(this, this.boundingBox.grow(0.20000000298023224D, 0.0D, 0.20000000298023224D));
  
-         if (this.R() && list != null && !list.isEmpty()) { // Kyoka
+         if (list != null && !list.isEmpty()) {
 @@ -1558,7 +1573,7 @@ public abstract class EntityLiving extends Entity {
                  }
                  // CraftBukkit end
@@ -556,7 +556,7 @@ index 7148f1e..fbb3b2b 100644
              entity.S = entity.locX;
              entity.T = entity.locY;
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 20258f1..4f858fd 100644
+index 33749df..caf6b42 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 @@ -1,7 +1,6 @@
@@ -568,5 +568,5 @@ index 20258f1..4f858fd 100644
  import java.io.ByteArrayOutputStream;
  import java.io.IOException;
 -- 
-1.9.0.msysgit.0
+1.9.1
 
