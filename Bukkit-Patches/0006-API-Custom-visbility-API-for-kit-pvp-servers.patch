@@ -1,0 +1,35 @@
+From eaf221ac78c5d86498445f5cbf918e1a953f575b Mon Sep 17 00:00:00 2001
+From: Jamie Shaw <lk@lkay.org>
+Date: Fri, 4 Jul 2014 20:51:55 +1000
+Subject: [PATCH] API: Custom visbility API for kit pvp servers
+
+
+diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
+index c16639e..2016dfb 100644
+--- a/src/main/java/org/bukkit/entity/Player.java
++++ b/src/main/java/org/bukkit/entity/Player.java
+@@ -1132,6 +1132,21 @@ public interface Player extends HumanEntity, Conversable, CommandSender, Offline
+         public String getDisplayName(CommandSender viewer) {
+             throw new UnsupportedOperationException("Not implemented yet.");
+         }
++
++        /**
++         * Same as normal except also hides potions/sounds.
++         */
++        public void hidePlayer(Player player) {
++            throw new UnsupportedOperationException("Not implemented yet.");
++        }
++
++        public void showPlayer(Player player) {
++            throw new UnsupportedOperationException("Not implemented yet.");
++        }
++
++        public boolean canSee(Player player) {
++            throw new UnsupportedOperationException("Not implemented yet.");
++        }
+     }
+     Kyoka kyoka();
+     // Kyoka end
+-- 
+1.9.1
+
