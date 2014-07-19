@@ -1,14 +1,14 @@
-From f330ff9f6e8512b1ce4e5a7abc71cbe5ca2e13e3 Mon Sep 17 00:00:00 2001
+From 71e31de7bc62bc76a3f80abbc4d3fb4aa65de62a Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Mon, 30 Jun 2014 16:14:23 +1000
 Subject: [PATCH] CORE: Allow use of Java 7
 
 
 diff --git a/pom.xml b/pom.xml
-index 9c92b3d..1faccac 100644
+index 9dad4ce..07247ad 100644
 --- a/pom.xml
 +++ b/pom.xml
-@@ -280,8 +280,8 @@
+@@ -268,8 +268,8 @@
          <artifactId>maven-compiler-plugin</artifactId>
          <version>2.3.2</version>
          <configuration>

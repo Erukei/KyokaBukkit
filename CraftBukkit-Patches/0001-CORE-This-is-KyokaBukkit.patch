@@ -1,11 +1,11 @@
-From 6b1fbf78a3d8a3c6bcfba1163cc99312e881fd33 Mon Sep 17 00:00:00 2001
+From 309085f74e20debd10e29b7f206ed5648e38e540 Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Sun, 29 Jun 2014 17:01:50 +1000
 Subject: [PATCH] CORE: This is KyokaBukkit
 
 
 diff --git a/pom.xml b/pom.xml
-index b2e2002..5758c7f 100644
+index b2e2002..9dad4ce 100644
 --- a/pom.xml
 +++ b/pom.xml
 @@ -1,12 +1,12 @@
@@ -25,7 +25,38 @@ index b2e2002..5758c7f 100644
  
    <properties>
      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-@@ -53,8 +53,8 @@
+@@ -18,24 +18,12 @@
+     <buildtag.suffix></buildtag.suffix>
+   </properties>
+ 
+-  <scm>
+-    <connection>scm:git:git://github.com/Bukkit/CraftBukkit.git</connection>
+-    <developerConnection>scm:git:ssh://git@github.com/Bukkit/CraftBukkit.git</developerConnection>
+-    <url>https://github.com/Bukkit/CraftBukkit</url>
+-  </scm>
+-
+-  <distributionManagement>
+-    <repository>
+-      <id>repobo-rel</id>
+-      <name>repo.bukkit.org Releases</name>
+-      <url>http://repo.bukkit.org/content/repositories/releases/</url>
+-    </repository>
+-    <snapshotRepository>
+-      <id>repobo-snap</id>
+-      <name>repo.bukkit.org Snapshots</name>
+-      <url>http://repo.bukkit.org/content/repositories/snapshots/</url>
+-    </snapshotRepository>
+-  </distributionManagement>
++  <parent>
++    <groupId>com.erukei</groupId>
++    <artifactId>kyoka-parent</artifactId>
++    <version>1.0-SNAPSHOT</version>
++    <relativePath>../pom.xml</relativePath>
++  </parent>
+ 
+   <repositories>
+     <repository>
+@@ -53,8 +41,8 @@
  
    <dependencies>
      <dependency>

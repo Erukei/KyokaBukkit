@@ -1,14 +1,14 @@
-From 71c62dc1ad153496a033b0dc43956b1ae343780b Mon Sep 17 00:00:00 2001
+From 3add81a736e86c7419ea8a2c873e159a68991d4e Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Sun, 29 Jun 2014 16:59:56 +1000
 Subject: [PATCH] CORE: This is KyokaBukkit
 
 
 diff --git a/pom.xml b/pom.xml
-index dcf7ed3..8c1d722 100644
+index dcf7ed3..ba7278c 100644
 --- a/pom.xml
 +++ b/pom.xml
-@@ -1,10 +1,10 @@
+@@ -1,42 +1,21 @@
  <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
      <modelVersion>4.0.0</modelVersion>
 -    <groupId>org.bukkit</groupId>
@@ -23,6 +23,44 @@ index dcf7ed3..8c1d722 100644
  
      <properties>
          <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+     </properties>
+ 
+-    <scm>
+-        <developerConnection>scm:git:git@github.com:Bukkit/Bukkit.git</developerConnection>
+-        <connection>scm:git:git://github.com/Bukkit/Bukkit.git</connection>
+-        <url>https://github.com/Bukkit/Bukkit/tree/master/</url>
+-    </scm>
+-
+-    <ciManagement>
+-        <system>jenkins</system>
+-        <url>http://ci.bukkit.org</url>
+-    </ciManagement>
+-
+-    <distributionManagement>
+-        <site>
+-            <id>jd.bukkit.org</id>
+-            <url>file:///home/javadocs/public_html/</url>
+-        </site>
+-        <repository>
+-            <id>repobo-rel</id>
+-            <name>repo.bukkit.org Releases</name>
+-            <url>http://repo.bukkit.org/content/repositories/releases/</url>
+-        </repository>
+-        <snapshotRepository>
+-            <id>repobo-snap</id>
+-            <name>repo.bukkit.org Snapshots</name>
+-            <url>http://repo.bukkit.org/content/repositories/snapshots/</url>
+-        </snapshotRepository>
+-    </distributionManagement>
++    <parent>
++        <groupId>com.erukei</groupId>
++        <artifactId>kyoka-parent</artifactId>
++        <version>1.0-SNAPSHOT</version>
++        <relativePath>../pom.xml</relativePath>
++    </parent>
+ 
+     <build>
+         <plugins>
 -- 
 1.9.1
 
