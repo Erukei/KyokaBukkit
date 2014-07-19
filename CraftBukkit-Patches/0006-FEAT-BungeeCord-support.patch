@@ -1,11 +1,11 @@
-From dfc7e2650c18f5a0def3f8509e2e1ed3d86aa02e Mon Sep 17 00:00:00 2001
+From 0250d3ceb96d47740eaacf34d915fd34e87d0e3e Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Tue, 1 Jul 2014 16:42:39 +1000
 Subject: [PATCH] FEAT: BungeeCord support
 
 
 diff --git a/src/main/java/com/erukei/kyoka/KyokaConfig.java b/src/main/java/com/erukei/kyoka/KyokaConfig.java
-index 94531cd..f3be3b9 100644
+index 319b2b0..5b5f145 100644
 --- a/src/main/java/com/erukei/kyoka/KyokaConfig.java
 +++ b/src/main/java/com/erukei/kyoka/KyokaConfig.java
 @@ -14,8 +14,11 @@ public class KyokaConfig {
@@ -18,7 +18,7 @@ index 94531cd..f3be3b9 100644
          config = YamlConfiguration.loadConfiguration(configFile);
 +        config.options().copyDefaults(true);
          for (Method method : KyokaConfig.class.getDeclaredMethods()) {
-             if (Modifier.isPrivate(method.getModifiers()) && method.getParameterCount() == 0 && method.getReturnType().equals(Void.TYPE)) {
+             if (Modifier.isPrivate(method.getModifiers()) && method.getParameterCount() == 0 && method.getReturnType() == Void.TYPE) {
                  method.setAccessible(true);
 @@ -34,4 +37,9 @@ public class KyokaConfig {
          }
