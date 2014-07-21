@@ -1,4 +1,4 @@
-From cb52b4f8dcb48fa26370551347045377490d6553 Mon Sep 17 00:00:00 2001
+From cca422f117bc98b512e0dc5497484058241c2b30 Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Mon, 30 Jun 2014 14:41:51 +1000
 Subject: [PATCH] CORE: Kyoka configuration
@@ -6,7 +6,7 @@ Subject: [PATCH] CORE: Kyoka configuration
 
 diff --git a/src/main/java/com/erukei/kyoka/KyokaConfig.java b/src/main/java/com/erukei/kyoka/KyokaConfig.java
 new file mode 100644
-index 0000000..94531cd
+index 0000000..ed33681
 --- /dev/null
 +++ b/src/main/java/com/erukei/kyoka/KyokaConfig.java
 @@ -0,0 +1,37 @@
@@ -29,7 +29,7 @@ index 0000000..94531cd
 +    public static void init() {
 +        config = YamlConfiguration.loadConfiguration(configFile);
 +        for (Method method : KyokaConfig.class.getDeclaredMethods()) {
-+            if (Modifier.isPrivate(method.getModifiers()) && method.getParameterCount() == 0 && method.getReturnType().equals(Void.TYPE)) {
++            if (Modifier.isPrivate(method.getModifiers()) && method.getParameterTypes().length == 0 && method.getReturnType().equals(Void.TYPE)) {
 +                method.setAccessible(true);
 +                try {
 +                    method.invoke(null);
