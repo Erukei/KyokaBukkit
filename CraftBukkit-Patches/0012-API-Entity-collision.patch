@@ -1,4 +1,4 @@
-From 5e9d8285e38f83d688ccde8fe0d145d0bd33b464 Mon Sep 17 00:00:00 2001
+From f85631f1d070f1f0785306f7c9fbf5deb862887e Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Fri, 4 Jul 2014 18:00:39 +1000
 Subject: [PATCH] API: Entity collision
@@ -30,24 +30,8 @@ index a44ad51..762c6d9 100644
              for (int i = 0; i < list.size(); ++i) {
                  Entity entity = (Entity) list.get(i);
  
-diff --git a/src/main/java/net/minecraft/server/EntityLiving.java.rej b/src/main/java/net/minecraft/server/EntityLiving.java.rej
-new file mode 100644
-index 0000000..9d4338c
---- /dev/null
-+++ b/src/main/java/net/minecraft/server/EntityLiving.java.rej
-@@ -0,0 +1,10 @@
-+diff a/src/main/java/net/minecraft/server/EntityLiving.java b/src/main/java/net/minecraft/server/EntityLiving.java	(rejected hunks)
-+@@ -1562,7 +1562,7 @@ public abstract class EntityLiving extends Entity {
-+ 
-+         List list = this.world.getEntities(this, this.boundingBox.grow(0.20000000298023224D, 0.0D, 0.20000000298023224D));
-+ 
-+-        if (list != null && !list.isEmpty()) {
-++        if (this.R() && list != null && !list.isEmpty()) { // Kyoka
-+             for (int i = 0; i < list.size(); ++i) {
-+                 Entity entity = (Entity) list.get(i);
-+ 
 diff --git a/src/main/java/net/minecraft/server/EntityPlayer.java b/src/main/java/net/minecraft/server/EntityPlayer.java
-index 0a7205a..87c8e41 100644
+index 0a7205a..e8017a8 100644
 --- a/src/main/java/net/minecraft/server/EntityPlayer.java
 +++ b/src/main/java/net/minecraft/server/EntityPlayer.java
 @@ -63,6 +63,19 @@ public class EntityPlayer extends EntityHuman implements ICrafting {
@@ -58,8 +42,8 @@ index 0a7205a..87c8e41 100644
 +    public boolean collidesWithEntities = true;
 +
 +    @Override
-+    public boolean Q() {
-+        return this.collidesWithEntities && super.Q();
++    public void Q() {
++        super.Q();
 +    }
 +
 +    @Override
@@ -92,31 +76,6 @@ index 91d54eb..2d21681 100644
      };
  
      public Kyoka kyoka() {
-diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java.rej b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java.rej
-new file mode 100644
-index 0000000..0f09436
---- /dev/null
-+++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java.rej
-@@ -0,0 +1,19 @@
-+diff a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java	(rejected hunks)
-+@@ -1325,6 +1325,17 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
-+         }
-+ 
-+         @Override
-++        public boolean getCollidesWithEntities() {
-++            return getHandle().collidesWithEntities;
-++        }
-++
-++        @Override
-++        public void setCollidesWithEntities(boolean shouldCollide) {
-++            getHandle().collidesWithEntities = shouldCollide;
-++            getHandle().k = shouldCollide;
-++        }
-++
-++        @Override
-+         public boolean hasFakeName(CommandSender viewer) {
-+             return viewer != null && cPlayer.fakeNames.containsKey(viewer);
-+         }
 -- 
 1.9.1
 
