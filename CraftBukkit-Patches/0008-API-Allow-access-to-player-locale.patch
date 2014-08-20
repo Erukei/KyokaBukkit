@@ -1,11 +1,11 @@
-From 7249870eede3f1b87547f062c06cf5a8864b6e8d Mon Sep 17 00:00:00 2001
+From 746230f5ae59a28409f76f3667e49c705e6177de Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Wed, 2 Jul 2014 20:51:56 +1000
 Subject: [PATCH] API: Allow access to player locale
 
 
 diff --git a/src/main/java/net/minecraft/server/EntityPlayer.java b/src/main/java/net/minecraft/server/EntityPlayer.java
-index 3a0d679..313812e 100644
+index 84673b4..6b2b60c 100644
 --- a/src/main/java/net/minecraft/server/EntityPlayer.java
 +++ b/src/main/java/net/minecraft/server/EntityPlayer.java
 @@ -30,7 +30,7 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
@@ -18,10 +18,10 @@ index 3a0d679..313812e 100644
      public final MinecraftServer server;
      public final PlayerInteractManager playerInteractManager;
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 0b2514a..4aeb8cd 100644
+index 083277f..1f67ece 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -1288,6 +1288,10 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -1291,6 +1291,10 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
      // Kyoka start
      private final Kyoka kyoka = new Kyoka() {

@@ -1,11 +1,11 @@
-From 2fad6bcd82a4d1b965a45bf63b9a354ffadd9297 Mon Sep 17 00:00:00 2001
+From ec1b9515c3a14854598eead43c41f430a5d9e4bb Mon Sep 17 00:00:00 2001
 From: Christian Nielsen <professiionaal@gmail.com>
 Date: Mon, 30 Jun 2014 23:30:39 -0400
 Subject: [PATCH] PERF: Optimized mob spawner logic
 
 
 diff --git a/src/main/java/net/minecraft/server/MobSpawnerAbstract.java b/src/main/java/net/minecraft/server/MobSpawnerAbstract.java
-index 06f9b1f..1e36160 100644
+index 93bb1ad..3bf43e6 100644
 --- a/src/main/java/net/minecraft/server/MobSpawnerAbstract.java
 +++ b/src/main/java/net/minecraft/server/MobSpawnerAbstract.java
 @@ -46,70 +46,51 @@ public abstract class MobSpawnerAbstract {

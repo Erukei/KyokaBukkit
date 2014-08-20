@@ -1,4 +1,4 @@
-From cca422f117bc98b512e0dc5497484058241c2b30 Mon Sep 17 00:00:00 2001
+From b30bd626490be1437e29f8f917aafccc531df725 Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Mon, 30 Jun 2014 14:41:51 +1000
 Subject: [PATCH] CORE: Kyoka configuration
@@ -48,7 +48,7 @@ index 0000000..ed33681
 +    }
 +}
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 3c92c3c..72fd7b7 100644
+index a666131..29b3648 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -23,6 +23,7 @@ import java.util.regex.Pattern;
@@ -59,7 +59,7 @@ index 3c92c3c..72fd7b7 100644
  import net.minecraft.server.ChunkCoordinates;
  import net.minecraft.server.CommandAchievement;
  import net.minecraft.server.CommandBan;
-@@ -279,6 +280,9 @@ public final class CraftServer implements Server {
+@@ -277,6 +278,9 @@ public final class CraftServer implements Server {
              configuration.set("aliases", "now-in-commands.yml");
          }
          saveConfig();

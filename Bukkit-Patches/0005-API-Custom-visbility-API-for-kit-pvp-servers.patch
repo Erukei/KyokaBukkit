@@ -1,15 +1,15 @@
-From eaf221ac78c5d86498445f5cbf918e1a953f575b Mon Sep 17 00:00:00 2001
+From 84f94a18ff25e2b37f8acc40a2ae944311eb9e94 Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Fri, 4 Jul 2014 20:51:55 +1000
 Subject: [PATCH] API: Custom visbility API for kit pvp servers
 
 
 diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
-index c16639e..2016dfb 100644
+index 717921f..35c4c4f 100644
 --- a/src/main/java/org/bukkit/entity/Player.java
 +++ b/src/main/java/org/bukkit/entity/Player.java
-@@ -1132,6 +1132,21 @@ public interface Player extends HumanEntity, Conversable, CommandSender, Offline
-         public String getDisplayName(CommandSender viewer) {
+@@ -1063,6 +1063,21 @@ public interface Player extends HumanEntity, Conversable, CommandSender, Offline
+         public void setCollidesWithEntities(boolean shouldCollide) {
              throw new UnsupportedOperationException("Not implemented yet.");
          }
 +

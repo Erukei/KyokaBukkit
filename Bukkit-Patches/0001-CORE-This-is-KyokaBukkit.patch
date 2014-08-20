@@ -1,11 +1,11 @@
-From 3add81a736e86c7419ea8a2c873e159a68991d4e Mon Sep 17 00:00:00 2001
+From a0c4c9ee471fbb566445300820c1819263ffa60b Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Sun, 29 Jun 2014 16:59:56 +1000
 Subject: [PATCH] CORE: This is KyokaBukkit
 
 
 diff --git a/pom.xml b/pom.xml
-index dcf7ed3..ba7278c 100644
+index 4c5937a..2c4608e 100644
 --- a/pom.xml
 +++ b/pom.xml
 @@ -1,42 +1,21 @@
@@ -15,7 +15,7 @@ index dcf7ed3..ba7278c 100644
 -    <artifactId>bukkit</artifactId>
 +    <groupId>com.erukei</groupId>
 +    <artifactId>kyoka-api</artifactId>
-     <version>1.7.9-R0.3-SNAPSHOT</version>
+     <version>1.7.10-R0.1-SNAPSHOT</version>
 -    <name>Bukkit</name>
 -    <url>http://www.bukkit.org</url>
 +    <name>Kyoka-API</name>

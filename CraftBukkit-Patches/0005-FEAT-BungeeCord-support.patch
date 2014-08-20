@@ -1,4 +1,4 @@
-From 6eba7e2c292b9c5a35ae65548a1e3c603d4a4ff0 Mon Sep 17 00:00:00 2001
+From a6e942b373fec2141e7c19dcb5bd400641e11a14 Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Tue, 1 Jul 2014 16:42:39 +1000
 Subject: [PATCH] FEAT: BungeeCord support
@@ -31,7 +31,7 @@ index ed33681..c464d7e 100644
 +    }
  }
 diff --git a/src/main/java/net/minecraft/server/HandshakeListener.java b/src/main/java/net/minecraft/server/HandshakeListener.java
-index 9cc9581..beda4e4 100644
+index 52bc69b..9ce3ab5 100644
 --- a/src/main/java/net/minecraft/server/HandshakeListener.java
 +++ b/src/main/java/net/minecraft/server/HandshakeListener.java
 @@ -1,5 +1,9 @@
@@ -293,10 +293,10 @@ index 6b91be7..e967362 100644
 +    }
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 72fd7b7..39b96db 100644
+index 29b3648..89dc6ef 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -680,7 +680,13 @@ public final class CraftServer implements Server {
+@@ -678,7 +678,13 @@ public final class CraftServer implements Server {
  
      @Override
      public long getConnectionThrottle() {

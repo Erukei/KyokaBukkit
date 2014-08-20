@@ -1,4 +1,4 @@
-From f7a36aa91213601cb4fd3366e436a08cf1c5f3ff Mon Sep 17 00:00:00 2001
+From e929a25e01f8dc474d4a179fe088adc55ada1ef3 Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Wed, 2 Jul 2014 15:47:05 +1000
 Subject: [PATCH] API: Skeleton
@@ -12,21 +12,6 @@ index e14e9f1..362c2c4 100644
       */
      @Deprecated
      UnsafeValues getUnsafe();
-+
- }
-diff --git a/src/main/java/org/bukkit/command/CommandSender.java b/src/main/java/org/bukkit/command/CommandSender.java
-index 148756b..f2b0769 100644
---- a/src/main/java/org/bukkit/command/CommandSender.java
-+++ b/src/main/java/org/bukkit/command/CommandSender.java
-@@ -32,4 +32,10 @@ public interface CommandSender extends Permissible {
-      * @return Name of the sender
-      */
-     public String getName();
-+
-+    // Kyoka start
-+    public class Kyoka {}
-+    Kyoka kyoka();
-+    // Kyoka end
 +
  }
 diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
