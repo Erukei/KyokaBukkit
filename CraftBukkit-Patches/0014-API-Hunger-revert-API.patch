@@ -1,0 +1,60 @@
+From 4809c84e7f42f332693d761c8b0040c4074a9295 Mon Sep 17 00:00:00 2001
+From: Jamie Shaw <lk@lkay.org>
+Date: Sat, 23 Aug 2014 21:11:35 +1000
+Subject: [PATCH] API: Hunger revert API
+
+
+diff --git a/src/main/java/net/minecraft/server/EntityHuman.java b/src/main/java/net/minecraft/server/EntityHuman.java
+index 3bf5034..bd4fa32 100644
+--- a/src/main/java/net/minecraft/server/EntityHuman.java
++++ b/src/main/java/net/minecraft/server/EntityHuman.java
+@@ -68,6 +68,7 @@ public abstract class EntityHuman extends EntityLiving implements ICommandListen
+     private int h;
+     private final GameProfile i;
+     public EntityFishingHook hookedFish;
++    public boolean revertedHunger = false; // Kyoka
+ 
+     public EntityHuman(World world, GameProfile gameprofile) {
+         super(world);
+@@ -1294,7 +1295,13 @@ public abstract class EntityHuman extends EntityLiving implements ICommandListen
+         super.bj();
+         this.a(StatisticList.r, 1);
+         if (this.isSprinting()) {
+-            this.applyExhaustion(0.8F);
++            // Kyoka start
++            if (revertedHunger) {
++                this.applyExhaustion(0.2F);
++            } else {
++                this.applyExhaustion(0.8F);
++            }
++            // Kyoka end
+         } else {
+             this.applyExhaustion(0.2F);
+         }
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+index 2d21681..ab68984 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+@@ -1313,6 +1313,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+ 
+ 
+     // Kyoka start
++    private final CraftPlayer craftPlayer = this;
+     private final Kyoka kyoka = new Kyoka() {
+         @Override
+         public String getLocale() {
+@@ -1366,6 +1367,11 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+             getHandle().collidesWithEntities = shouldCollide;
+             getHandle().k = shouldCollide;
+         }
++
++        @Override
++        public void setRevertedHunger(boolean useOldHunger) {
++            craftPlayer.getHandle().revertedHunger = useOldHunger;
++        }
+     };
+ 
+     public Kyoka kyoka() {
+-- 
+1.9.1
+

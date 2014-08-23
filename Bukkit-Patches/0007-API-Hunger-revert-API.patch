@@ -1,0 +1,28 @@
+From 4caa2cde05ea0241994381c52e38af430be264b0 Mon Sep 17 00:00:00 2001
+From: Jamie Shaw <lk@lkay.org>
+Date: Sat, 23 Aug 2014 21:11:30 +1000
+Subject: [PATCH] API: Hunger revert API
+
+
+diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
+index 7720f9d..ec58741 100644
+--- a/src/main/java/org/bukkit/entity/Player.java
++++ b/src/main/java/org/bukkit/entity/Player.java
+@@ -1078,6 +1078,14 @@ public interface Player extends HumanEntity, Conversable, CommandSender, Offline
+         public boolean canSee(Player player) {
+             throw new UnsupportedOperationException("Not implemented yet.");
+         }
++
++        /**
++         * Set if the player has reverted hunger.
++         * @param useOldHunger If they have reverted hunger.
++         */
++        public void setRevertedHunger(boolean useOldHunger) {
++            throw new UnsupportedOperationException("Not implemented yet.");
++        }
+     }
+ 
+     Kyoka kyoka();
+-- 
+1.9.1
+
