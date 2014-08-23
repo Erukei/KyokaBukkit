@@ -1,4 +1,4 @@
-From d013cf2ebdb220acd6bb99c0439c70bf86b99877 Mon Sep 17 00:00:00 2001
+From 69413da765b50cf12e253caf53e5fa2a483ac4a7 Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Sat, 23 Aug 2014 20:10:36 +1000
 Subject: [PATCH] API: Custom effects for LivingEntities
@@ -279,13 +279,11 @@ index 0000000..26cbe5b
 +}
 diff --git a/src/main/java/net/minecraft/server/MobEffectAttackDamage.java b/src/main/java/net/minecraft/server/MobEffectAttackDamage.java
 new file mode 100644
-index 0000000..e766550
+index 0000000..0491eb8
 --- /dev/null
 +++ b/src/main/java/net/minecraft/server/MobEffectAttackDamage.java
-@@ -0,0 +1,21 @@
+@@ -0,0 +1,18 @@
 +package net.minecraft.server;
-+
-+import org.bukkit.Bukkit;
 +
 +public class MobEffectAttackDamage extends MobEffectList {
 +
@@ -294,7 +292,6 @@ index 0000000..e766550
 +    }
 +
 +    public double a(EntityLiving entityLiving, int i, AttributeModifier attributemodifier) { // Kyoka
-+        Bukkit.getLogger().warning("SHIOTFIUCKLOdjfgdiok");
 +        // Kyoka start
 +        if(entityLiving.hasCustomEffectAmount(this.id)) {
 +            return entityLiving.getEffectAmount(this.id) * (double) (i + 1);
