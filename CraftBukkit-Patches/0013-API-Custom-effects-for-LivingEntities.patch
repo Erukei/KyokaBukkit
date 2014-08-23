@@ -1,4 +1,4 @@
-From 78f3d73c3bf8c23b3e4eabdcb98131e1268ed530 Mon Sep 17 00:00:00 2001
+From 8d48cf3a766fbecc81c207d9d585a79e4d5183bc Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Sat, 23 Aug 2014 20:10:36 +1000
 Subject: [PATCH] API: Custom effects for LivingEntities
@@ -71,7 +71,7 @@ index 762c6d9..d2a5e55 100644
  }
 diff --git a/src/main/java/net/minecraft/server/InstantMobEffect.java b/src/main/java/net/minecraft/server/InstantMobEffect.java
 new file mode 100644
-index 0000000..637370b
+index 0000000..f15e424
 --- /dev/null
 +++ b/src/main/java/net/minecraft/server/InstantMobEffect.java
 @@ -0,0 +1,16 @@
@@ -87,7 +87,7 @@ index 0000000..637370b
 +        return true;
 +    }
 +
-+    public boolean a(int i, int j) {
++    public boolean a(EntityLiving entityLiving, int i, int j) { // Kyoka
 +        return i >= 1;
 +    }
 +}
