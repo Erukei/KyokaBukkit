@@ -1,4 +1,4 @@
-From 69413da765b50cf12e253caf53e5fa2a483ac4a7 Mon Sep 17 00:00:00 2001
+From 78f3d73c3bf8c23b3e4eabdcb98131e1268ed530 Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Sat, 23 Aug 2014 20:10:36 +1000
 Subject: [PATCH] API: Custom effects for LivingEntities
@@ -323,7 +323,7 @@ index 0000000..2e9f192
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/server/MobEffectList.java b/src/main/java/net/minecraft/server/MobEffectList.java
-index 6ec03bb..9921b08 100644
+index 6ec03bb..adcbc09 100644
 --- a/src/main/java/net/minecraft/server/MobEffectList.java
 +++ b/src/main/java/net/minecraft/server/MobEffectList.java
 @@ -8,6 +8,7 @@ import java.util.Map.Entry;
@@ -395,7 +395,37 @@ index 6ec03bb..9921b08 100644
          }
      }
  
-@@ -146,8 +177,14 @@ public class MobEffectList {
+@@ -128,7 +159,13 @@ public class MobEffectList {
+ 
+         if ((this.id != HEAL.id || entityliving1.aR()) && (this.id != HARM.id || !entityliving1.aR())) {
+             if (this.id == HARM.id && !entityliving1.aR() || this.id == HEAL.id && entityliving1.aR()) {
+-                j = (int) (d0 * (double) (6 << i) + 0.5D);
++                // Kyoka start
++                if(entityliving.hasCustomEffectAmount(this.id)) {
++                    j = (int) (d0 * (double) (entityliving.getEffectAmount(this.id) << i) + 0.5D);
++                } else {
++                    j = (int) (d0 * (double) (6 << i) + 0.5D);
++                }
++                // Kyoka end
+                 if (entityliving == null) {
+                     entityliving1.damageEntity(DamageSource.MAGIC, (float) j);
+                 } else {
+@@ -137,7 +174,13 @@ public class MobEffectList {
+                 }
+             }
+         } else {
+-            j = (int) (d0 * (double) (4 << i) + 0.5D);
++            // Kyoka start
++            if(entityliving.hasCustomEffectAmount(this.id)) {
++                j = (int) (d0 * (double) (entityliving.getEffectAmount(this.id) << i) + 0.5D);
++            } else {
++                j = (int) (d0 * (double) (4 << i) + 0.5D);
++            }
++            // Kyoka end
+             entityliving1.heal((float) j, RegainReason.MAGIC); // CraftBukkit
+         }
+     }
+@@ -146,8 +189,14 @@ public class MobEffectList {
          return false;
      }
  
@@ -411,7 +441,7 @@ index 6ec03bb..9921b08 100644
  
          if (this.id == REGENERATION.id) {
              k = 50 >> j;
-@@ -220,12 +257,18 @@ public class MobEffectList {
+@@ -220,12 +269,18 @@ public class MobEffectList {
                  AttributeModifier attributemodifier = (AttributeModifier) entry.getValue();
  
                  attributeinstance.b(attributemodifier);
