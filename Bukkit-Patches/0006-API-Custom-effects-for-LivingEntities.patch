@@ -1,0 +1,70 @@
+From 6d266e66dc266b2ca126def18f3d0dab8decdb57 Mon Sep 17 00:00:00 2001
+From: Jamie Shaw <lk@lkay.org>
+Date: Sat, 23 Aug 2014 20:10:27 +1000
+Subject: [PATCH] API: Custom effects for LivingEntities
+
+
+diff --git a/src/main/java/org/bukkit/entity/LivingEntity.java b/src/main/java/org/bukkit/entity/LivingEntity.java
+index 6c8b4f8..12cc2b2 100644
+--- a/src/main/java/org/bukkit/entity/LivingEntity.java
++++ b/src/main/java/org/bukkit/entity/LivingEntity.java
+@@ -391,4 +391,44 @@ public interface LivingEntity extends Entity, Damageable, ProjectileSource {
+      * @return whether the operation was successful
+      */
+     public boolean setLeashHolder(Entity holder);
++
++    // Kyoka start
++    public class KyokaEffects {
++
++        /**
++         * Set how often tick-based effects are applied.
++         * @param effectType Effect to set tick rate for.
++         * @param tickRate Tick rate to set for the effect.
++         */
++        public void setEffectTickRate(PotionEffectType effectType, int tickRate) {
++            throw new UnsupportedOperationException("Not implemented yet.");
++        }
++
++        /**
++         * Set the base amount for a effect to apply.
++         * @param effectType Effect to set amount for.
++         * @param amount Amount to set for the effect.
++         */
++        public void setEffectAmount(PotionEffectType effectType, int amount) {
++            throw new UnsupportedOperationException("Not implemented yet.");
++        }
++
++        /**
++         * For effects that accept an operation id to configure their behaviour.
++         * @param effectType Effect to set operation id for.
++         * @param operationId Operation id to set for the effect.
++         */
++        public void setEffectOperation(PotionEffectType effectType, int operationId) {
++            throw new UnsupportedOperationException("Not implemented yet.");
++        }
++
++        /**
++         * Reset all custom effect modifiers.
++         */
++        public void resetCustomEffects(){
++            throw new UnsupportedOperationException("Not implemented yet.");
++        }
++    }
++    KyokaEffects kyokaEffects();
++    // Kyoka end
+ }
+diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
+index 35c4c4f..7720f9d 100644
+--- a/src/main/java/org/bukkit/entity/Player.java
++++ b/src/main/java/org/bukkit/entity/Player.java
+@@ -1079,6 +1079,7 @@ public interface Player extends HumanEntity, Conversable, CommandSender, Offline
+             throw new UnsupportedOperationException("Not implemented yet.");
+         }
+     }
++
+     Kyoka kyoka();
+     // Kyoka end
+ }
+-- 
+1.9.1
+

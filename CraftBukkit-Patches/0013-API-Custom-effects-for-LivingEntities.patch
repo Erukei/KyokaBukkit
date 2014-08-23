@@ -1,0 +1,506 @@
+From d013cf2ebdb220acd6bb99c0439c70bf86b99877 Mon Sep 17 00:00:00 2001
+From: Jamie Shaw <lk@lkay.org>
+Date: Sat, 23 Aug 2014 20:10:36 +1000
+Subject: [PATCH] API: Custom effects for LivingEntities
+
+
+diff --git a/src/main/java/net/minecraft/server/EntityLiving.java b/src/main/java/net/minecraft/server/EntityLiving.java
+index 762c6d9..d2a5e55 100644
+--- a/src/main/java/net/minecraft/server/EntityLiving.java
++++ b/src/main/java/net/minecraft/server/EntityLiving.java
+@@ -82,6 +82,11 @@ public abstract class EntityLiving extends Entity {
+     public int maxAirTicks = 300;
+     ArrayList<org.bukkit.inventory.ItemStack> drops = null;
+     // CraftBukkit end
++    // Kyoka start
++    HashMap<Integer, Integer> effectTickRates = new HashMap<>();
++    HashMap<Integer, Integer> effectAmounts = new HashMap<>();
++    HashMap<Integer, Integer> effectOperations = new HashMap<>();
++    // Kyoka end
+ 
+     public EntityLiving(World world) {
+         super(world);
+@@ -1717,4 +1722,48 @@ public abstract class EntityLiving extends Entity {
+     public void bu() {}
+ 
+     public void bv() {}
++
++    // Kyoka start
++    public boolean hasCustomEffectTickRate(int effectId) {
++        return effectTickRates.containsKey(effectId);
++    }
++
++    public int getEffectTickRate(int effectId) {
++        return effectTickRates.get(effectId);
++    }
++
++    public boolean hasCustomEffectAmount(int effectId) {
++        return effectAmounts.containsKey(effectId);
++    }
++
++    public int getEffectAmount(int effectId) {
++        return effectAmounts.get(effectId);
++    }
++
++    public boolean hasCustomEffectOperation(int effectId) {
++        return effectOperations.containsKey(effectId);
++    }
++
++    public int getEffectOperation(int effectId) {
++        return effectOperations.get(effectId);
++    }
++
++    public void setEffectTickRate(int effectId, int tickRate) {
++        effectTickRates.put(effectId, tickRate);
++    }
++
++    public void setEffectAmount(int effectId, int amount) {
++        effectAmounts.put(effectId, amount);
++    }
++
++    public void setEffectOperation(int effectId, int operationId) {
++        effectOperations.put(effectId, operationId);
++    }
++
++    public void resetCustomEffects() {
++        effectTickRates.clear();
++        effectAmounts.clear();
++        effectOperations.clear();
++    }
++    // Kyoka end
+ }
+diff --git a/src/main/java/net/minecraft/server/InstantMobEffect.java b/src/main/java/net/minecraft/server/InstantMobEffect.java
+new file mode 100644
+index 0000000..637370b
+--- /dev/null
++++ b/src/main/java/net/minecraft/server/InstantMobEffect.java
+@@ -0,0 +1,16 @@
++package net.minecraft.server;
++
++public class InstantMobEffect extends MobEffectList {
++
++    public InstantMobEffect(int i, boolean flag, int j) {
++        super(i, flag, j);
++    }
++
++    public boolean isInstant() {
++        return true;
++    }
++
++    public boolean a(int i, int j) {
++        return i >= 1;
++    }
++}
+diff --git a/src/main/java/net/minecraft/server/MobEffect.java b/src/main/java/net/minecraft/server/MobEffect.java
+new file mode 100644
+index 0000000..6234418
+--- /dev/null
++++ b/src/main/java/net/minecraft/server/MobEffect.java
+@@ -0,0 +1,144 @@
++package net.minecraft.server;
++
++public class MobEffect {
++
++    private int effectId;
++    private int duration;
++    private int amplification;
++    private boolean splash;
++    private boolean ambient;
++
++    public MobEffect(int i, int j) {
++        this(i, j, 0);
++    }
++
++    public MobEffect(int i, int j, int k) {
++        this(i, j, k, false);
++    }
++
++    public MobEffect(int i, int j, int k, boolean flag) {
++        this.effectId = i;
++        this.duration = j;
++        this.amplification = k;
++        this.ambient = flag;
++    }
++
++    public MobEffect(MobEffect mobeffect) {
++        this.effectId = mobeffect.effectId;
++        this.duration = mobeffect.duration;
++        this.amplification = mobeffect.amplification;
++    }
++
++    public void a(MobEffect mobeffect) {
++        if (this.effectId != mobeffect.effectId) {
++            System.err.println("This method should only be called for matching effects!");
++        }
++
++        if (mobeffect.amplification > this.amplification) {
++            this.amplification = mobeffect.amplification;
++            this.duration = mobeffect.duration;
++        } else if (mobeffect.amplification == this.amplification && this.duration < mobeffect.duration) {
++            this.duration = mobeffect.duration;
++        } else if (!mobeffect.ambient && this.ambient) {
++            this.ambient = mobeffect.ambient;
++        }
++    }
++
++    public int getEffectId() {
++        return this.effectId;
++    }
++
++    public int getDuration() {
++        return this.duration;
++    }
++
++    public int getAmplifier() {
++        return this.amplification;
++    }
++
++    public void setSplash(boolean flag) {
++        this.splash = flag;
++    }
++
++    public boolean isAmbient() {
++        return this.ambient;
++    }
++
++    public boolean tick(EntityLiving entityliving) {
++        if (this.duration > 0) {
++            if (MobEffectList.byId[this.effectId].a(entityliving, this.duration, this.amplification)) {
++                this.b(entityliving);
++            }
++
++            this.h();
++        }
++
++        return this.duration > 0;
++    }
++
++    private int h() {
++        return --this.duration;
++    }
++
++    public void b(EntityLiving entityliving) {
++        if (this.duration > 0) {
++            MobEffectList.byId[this.effectId].tick(entityliving, this.amplification);
++        }
++    }
++
++    public String f() {
++        return MobEffectList.byId[this.effectId].a();
++    }
++
++    public int hashCode() {
++        return this.effectId;
++    }
++
++    public String toString() {
++        String s = "";
++
++        if (this.getAmplifier() > 0) {
++            s = this.f() + " x " + (this.getAmplifier() + 1) + ", Duration: " + this.getDuration();
++        } else {
++            s = this.f() + ", Duration: " + this.getDuration();
++        }
++
++        if (this.splash) {
++            s = s + ", Splash: true";
++        }
++
++        return MobEffectList.byId[this.effectId].i() ? "(" + s + ")" : s;
++    }
++
++    public boolean equals(Object object) {
++        if (!(object instanceof MobEffect)) {
++            return false;
++        } else {
++            MobEffect mobeffect = (MobEffect) object;
++
++            return this.effectId == mobeffect.effectId && this.amplification == mobeffect.amplification && this.duration == mobeffect.duration && this.splash == mobeffect.splash && this.ambient == mobeffect.ambient;
++        }
++    }
++
++    public NBTTagCompound a(NBTTagCompound nbttagcompound) {
++        nbttagcompound.setByte("Id", (byte) this.getEffectId());
++        nbttagcompound.setByte("Amplifier", (byte) this.getAmplifier());
++        nbttagcompound.setInt("Duration", this.getDuration());
++        nbttagcompound.setBoolean("Ambient", this.isAmbient());
++        return nbttagcompound;
++    }
++
++    public static MobEffect b(NBTTagCompound nbttagcompound) {
++        byte b0 = nbttagcompound.getByte("Id");
++
++        if (b0 >= 0 && b0 < MobEffectList.byId.length && MobEffectList.byId[b0] != null) {
++            byte b1 = nbttagcompound.getByte("Amplifier");
++            int i = nbttagcompound.getInt("Duration");
++            boolean flag = nbttagcompound.getBoolean("Ambient");
++
++            return new MobEffect(b0, i, b1, flag);
++        } else {
++            return null;
++        }
++    }
++}
+diff --git a/src/main/java/net/minecraft/server/MobEffectAbsorption.java b/src/main/java/net/minecraft/server/MobEffectAbsorption.java
+new file mode 100644
+index 0000000..26cbe5b
+--- /dev/null
++++ b/src/main/java/net/minecraft/server/MobEffectAbsorption.java
+@@ -0,0 +1,30 @@
++package net.minecraft.server;
++
++public class MobEffectAbsorption extends MobEffectList {
++
++    protected MobEffectAbsorption(int i, boolean flag, int j) {
++        super(i, flag, j);
++    }
++
++    public void a(EntityLiving entityliving, AttributeMapBase attributemapbase, int i) {  // Kyoka
++        // Kyoka start
++        if(entityliving.hasCustomEffectAmount(this.id)) {
++            entityliving.setAbsorptionHearts(entityliving.getAbsorptionHearts() - (float) (entityliving.getEffectAmount(this.id) * (i + 1)));
++        } else {
++            entityliving.setAbsorptionHearts(entityliving.getAbsorptionHearts() - (float) (4 * (i + 1)));
++        }
++        // Kyoka end
++        super.a(entityliving, attributemapbase, i);
++    }
++
++    public void b(EntityLiving entityliving, AttributeMapBase attributemapbase, int i) { // Kyoka
++        // Kyoka start
++        if(entityliving.hasCustomEffectAmount(this.id)) {
++            entityliving.setAbsorptionHearts(entityliving.getAbsorptionHearts() + (float) (entityliving.getEffectAmount(this.id) * (i + 1)));
++        } else {
++            entityliving.setAbsorptionHearts(entityliving.getAbsorptionHearts() + (float) (4 * (i + 1)));
++        }
++        // Kyoka end
++        super.b(entityliving, attributemapbase, i);
++    }
++}
+diff --git a/src/main/java/net/minecraft/server/MobEffectAttackDamage.java b/src/main/java/net/minecraft/server/MobEffectAttackDamage.java
+new file mode 100644
+index 0000000..e766550
+--- /dev/null
++++ b/src/main/java/net/minecraft/server/MobEffectAttackDamage.java
+@@ -0,0 +1,21 @@
++package net.minecraft.server;
++
++import org.bukkit.Bukkit;
++
++public class MobEffectAttackDamage extends MobEffectList {
++
++    protected MobEffectAttackDamage(int i, boolean flag, int j) {
++        super(i, flag, j);
++    }
++
++    public double a(EntityLiving entityLiving, int i, AttributeModifier attributemodifier) { // Kyoka
++        Bukkit.getLogger().warning("SHIOTFIUCKLOdjfgdiok");
++        // Kyoka start
++        if(entityLiving.hasCustomEffectAmount(this.id)) {
++            return entityLiving.getEffectAmount(this.id) * (double) (i + 1);
++        } else {
++            return this.id == MobEffectList.WEAKNESS.id ? (double) (-0.5F * (float) (i + 1)) : 1.3D * (double) (i + 1);
++        }
++        // Kyoka end
++    }
++}
+diff --git a/src/main/java/net/minecraft/server/MobEffectHealthBoost.java b/src/main/java/net/minecraft/server/MobEffectHealthBoost.java
+new file mode 100644
+index 0000000..2e9f192
+--- /dev/null
++++ b/src/main/java/net/minecraft/server/MobEffectHealthBoost.java
+@@ -0,0 +1,15 @@
++package net.minecraft.server;
++
++public class MobEffectHealthBoost extends MobEffectList {
++
++    public MobEffectHealthBoost(int i, boolean flag, int j) {
++        super(i, flag, j);
++    }
++
++    public void a(EntityLiving entityliving, AttributeMapBase attributemapbase, int i) {
++        super.a(entityliving, attributemapbase, i);
++        if (entityliving.getHealth() > entityliving.getMaxHealth()) {
++            entityliving.setHealth(entityliving.getMaxHealth());
++        }
++    }
++}
+diff --git a/src/main/java/net/minecraft/server/MobEffectList.java b/src/main/java/net/minecraft/server/MobEffectList.java
+index 6ec03bb..9921b08 100644
+--- a/src/main/java/net/minecraft/server/MobEffectList.java
++++ b/src/main/java/net/minecraft/server/MobEffectList.java
+@@ -8,6 +8,7 @@ import java.util.Map.Entry;
+ import net.minecraft.util.com.google.common.collect.Maps;
+ 
+ // CraftBukkit start
++import org.bukkit.Bukkit;
+ import org.bukkit.craftbukkit.event.CraftEventFactory;
+ import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
+ // CraftBukkit end
+@@ -83,14 +84,32 @@ public class MobEffectList {
+     public void tick(EntityLiving entityliving, int i) {
+         if (this.id == REGENERATION.id) {
+             if (entityliving.getHealth() < entityliving.getMaxHealth()) {
+-                entityliving.heal(1.0F, RegainReason.MAGIC_REGEN); // CraftBukkit
++                // Kyoka start
++                if(entityliving.hasCustomEffectAmount(this.id)) {
++                    entityliving.heal(entityliving.getEffectAmount(this.id), RegainReason.MAGIC_REGEN);
++                } else {
++                    entityliving.heal(1.0F, RegainReason.MAGIC_REGEN); // CraftBukkit
++                }
++                // Kyoka end
+             }
+         } else if (this.id == POISON.id) {
+             if (entityliving.getHealth() > 1.0F) {
+-                entityliving.damageEntity(CraftEventFactory.POISON, 1.0F); // CraftBukkit - DamageSource.MAGIC -> CraftEventFactory.POISON
++                // Kyoka start
++                if(entityliving.hasCustomEffectAmount(this.id)) {
++                    entityliving.damageEntity(CraftEventFactory.POISON, entityliving.getEffectAmount(this.id));
++                } else {
++                    entityliving.damageEntity(CraftEventFactory.POISON, 1.0F); // CraftBukkit - DamageSource.MAGIC -> CraftEventFactory.POISON
++                }
++                // Kyoka end
+             }
+         } else if (this.id == WITHER.id) {
+-            entityliving.damageEntity(DamageSource.WITHER, 1.0F);
++            // Kyoka start
++            if(entityliving.hasCustomEffectAmount(this.id)) {
++                entityliving.damageEntity(DamageSource.WITHER, entityliving.getEffectAmount(this.id));
++            } else {
++                entityliving.damageEntity(DamageSource.WITHER, 1.0F);
++            }
++            // Kyoka end
+         } else if (this.id == HUNGER.id && entityliving instanceof EntityHuman) {
+             ((EntityHuman) entityliving).applyExhaustion(0.025F * (float) (i + 1));
+         } else if (this.id == SATURATION.id && entityliving instanceof EntityHuman) {
+@@ -110,10 +129,22 @@ public class MobEffectList {
+             }
+         } else if ((this.id != HEAL.id || entityliving.aR()) && (this.id != HARM.id || !entityliving.aR())) {
+             if (this.id == HARM.id && !entityliving.aR() || this.id == HEAL.id && entityliving.aR()) {
+-                entityliving.damageEntity(DamageSource.MAGIC, (float) (6 << i));
++                // Kyoka start
++                if (entityliving.hasCustomEffectAmount(this.id)) {
++                    entityliving.damageEntity(DamageSource.MAGIC, (float) (entityliving.getEffectAmount(this.id) << i));
++                } else {
++                    entityliving.damageEntity(DamageSource.MAGIC, (float) (6 << i));
++                }
++                // Kyoka end
+             }
+         } else {
+-            entityliving.heal((float) Math.max(4 << i, 0), RegainReason.MAGIC); // CraftBukkit
++            // Kyoka start
++            if(entityliving.hasCustomEffectAmount(this.id)) {
++                entityliving.heal((float) Math.max(entityliving.getEffectAmount(this.id) << i, 0), RegainReason.MAGIC);
++            } else {
++                entityliving.heal((float) Math.max(4 << i, 0), RegainReason.MAGIC);
++            }
++            // Kyoka end
+         }
+     }
+ 
+@@ -146,8 +177,14 @@ public class MobEffectList {
+         return false;
+     }
+ 
+-    public boolean a(int i, int j) {
++    public boolean a(EntityLiving entityLiving, int i, int j) {
+         int k;
++        // Kyoka start
++        if(entityLiving.hasCustomEffectTickRate(this.id)) {
++            k = entityLiving.getEffectTickRate(this.id) >> j;
++            return k <= 0 || i % k == 0;
++        }
++        // Kyoka end
+ 
+         if (this.id == REGENERATION.id) {
+             k = 50 >> j;
+@@ -220,12 +257,18 @@ public class MobEffectList {
+                 AttributeModifier attributemodifier = (AttributeModifier) entry.getValue();
+ 
+                 attributeinstance.b(attributemodifier);
+-                attributeinstance.a(new AttributeModifier(attributemodifier.a(), this.a() + " " + i, this.a(i, attributemodifier), attributemodifier.c()));
++                // Kyoka start
++                if (entityliving.hasCustomEffectOperation(this.id)) {
++                    attributeinstance.a(new AttributeModifier(attributemodifier.a(), this.a() + " " + i, this.a(entityliving, i, attributemodifier), entityliving.getEffectOperation(this.id)));
++                } else {
++                    attributeinstance.a(new AttributeModifier(attributemodifier.a(), this.a() + " " + i, this.a(entityliving, i, attributemodifier), attributemodifier.c()));
++                }
++                // Kyoka end
+             }
+         }
+     }
+ 
+-    public double a(int i, AttributeModifier attributemodifier) {
++    public double a(EntityLiving entityLiving, int i, AttributeModifier attributemodifier) { // Kyoka
+         return attributemodifier.d() * (double) (i + 1);
+     }
+ }
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
+index add554e..4ad903d 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
+@@ -6,27 +6,7 @@ import java.util.HashSet;
+ import java.util.Iterator;
+ import java.util.List;
+ 
+-import net.minecraft.server.DamageSource;
+-import net.minecraft.server.EntityArrow;
+-import net.minecraft.server.EntityEgg;
+-import net.minecraft.server.EntityEnderDragon;
+-import net.minecraft.server.EntityEnderPearl;
+-import net.minecraft.server.EntityFishingHook;
+-import net.minecraft.server.EntityHuman;
+-import net.minecraft.server.EntityFireball;
+-import net.minecraft.server.EntityInsentient;
+-import net.minecraft.server.EntityLargeFireball;
+-import net.minecraft.server.EntityLiving;
+-import net.minecraft.server.EntityPlayer;
+-import net.minecraft.server.EntityPotion;
+-import net.minecraft.server.EntitySmallFireball;
+-import net.minecraft.server.EntitySnowball;
+-import net.minecraft.server.EntityThrownExpBottle;
+-import net.minecraft.server.EntityWither;
+-import net.minecraft.server.EntityWitherSkull;
+-import net.minecraft.server.GenericAttributes;
+-import net.minecraft.server.MobEffect;
+-import net.minecraft.server.MobEffectList;
++import net.minecraft.server.*;
+ 
+ import org.apache.commons.lang.Validate;
+ import org.bukkit.Location;
+@@ -504,4 +484,32 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
+     public void _INVALID_setMaxHealth(int health) {
+         setMaxHealth(health);
+     }
++
++    // Kyoka start
++    private final LivingEntity.KyokaEffects kyokaEffects = new LivingEntity.KyokaEffects() {
++        @Override
++        public void setEffectTickRate(PotionEffectType effectType, int tickRate) {
++            getHandle().setEffectTickRate(effectType.getId(), tickRate);
++        }
++
++        @Override
++        public void setEffectAmount(PotionEffectType effectType, int amount) {
++            getHandle().setEffectAmount(effectType.getId(), amount);
++        }
++
++        @Override
++        public void setEffectOperation(PotionEffectType effectType, int operationId) {
++            getHandle().setEffectOperation(effectType.getId(), operationId);
++        }
++
++        @Override
++        public void resetCustomEffects() {
++            getHandle().resetCustomEffects();
++        }
++    };
++
++    public LivingEntity.KyokaEffects kyokaEffects() {
++        return kyokaEffects;
++    }
++    // Kyoka end
+ }
+-- 
+1.9.1
+
