@@ -1,0 +1,79 @@
+From 126351145ccb577385d2709895b9409f85dd12d2 Mon Sep 17 00:00:00 2001
+From: Jamie Shaw <lk@lkay.org>
+Date: Sun, 24 Aug 2014 16:59:28 +1000
+Subject: [PATCH] FEAT: Configurable despawn ticks for arrows/items
+
+
+diff --git a/src/main/java/com/erukei/kyoka/KyokaConfig.java b/src/main/java/com/erukei/kyoka/KyokaConfig.java
+index c464d7e..a6a1340 100644
+--- a/src/main/java/com/erukei/kyoka/KyokaConfig.java
++++ b/src/main/java/com/erukei/kyoka/KyokaConfig.java
+@@ -15,6 +15,8 @@ public class KyokaConfig {
+     private static YamlConfiguration config;
+ 
+     public static boolean bungeecord;
++    public static int itemDespawnTicks;
++    public static int arrowDespawnTicks;
+ 
+     public static void init() {
+         config = YamlConfiguration.loadConfiguration(configFile);
+@@ -42,4 +44,14 @@ public class KyokaConfig {
+         config.addDefault("bungeecord", false);
+         bungeecord = config.getBoolean("bungeecord");
+     }
++
++    private static void itemDespawnTicks() {
++        config.addDefault("item-despawn-ticks", 6000);
++        itemDespawnTicks = config.getInt("item-despawn-ticks");
++    }
++
++    private static void arrowDespawnTicks() {
++        config.addDefault("arrow-despawn-ticks", 1200);
++        arrowDespawnTicks = config.getInt("arrow-despawn-ticks");
++    }
+ }
+diff --git a/src/main/java/net/minecraft/server/EntityArrow.java b/src/main/java/net/minecraft/server/EntityArrow.java
+index c0cdd61..25fcb5f 100644
+--- a/src/main/java/net/minecraft/server/EntityArrow.java
++++ b/src/main/java/net/minecraft/server/EntityArrow.java
+@@ -3,6 +3,7 @@ package net.minecraft.server;
+ import java.util.List;
+ 
+ // CraftBukkit start
++import com.erukei.kyoka.KyokaConfig;
+ import org.bukkit.entity.LivingEntity;
+ import org.bukkit.event.entity.EntityCombustByEntityEvent;
+ import org.bukkit.event.player.PlayerPickupItemEvent;
+@@ -144,7 +145,7 @@ public class EntityArrow extends Entity implements IProjectile {
+ 
+             if (block == this.g && i == this.h) {
+                 ++this.at;
+-                if (this.at == 1200) {
++                if (this.at >= KyokaConfig.arrowDespawnTicks) {
+                     this.die();
+                 }
+             } else {
+diff --git a/src/main/java/net/minecraft/server/EntityItem.java b/src/main/java/net/minecraft/server/EntityItem.java
+index 6e97ca4..fa335fc 100644
+--- a/src/main/java/net/minecraft/server/EntityItem.java
++++ b/src/main/java/net/minecraft/server/EntityItem.java
+@@ -2,6 +2,7 @@ package net.minecraft.server;
+ 
+ import java.util.Iterator;
+ 
++import com.erukei.kyoka.KyokaConfig;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+@@ -106,7 +107,7 @@ public class EntityItem extends Entity {
+             }
+ 
+             // ++this.age; // CraftBukkit - Moved up
+-            if (!this.world.isStatic && this.age >= 6000) {
++            if (!this.world.isStatic && this.age >= KyokaConfig.itemDespawnTicks) {
+                 // CraftBukkit start - fire ItemDespawnEvent
+                 if (org.bukkit.craftbukkit.event.CraftEventFactory.callItemDespawnEvent(this).isCancelled()) {
+                     this.age = 0;
+-- 
+1.9.1
+
