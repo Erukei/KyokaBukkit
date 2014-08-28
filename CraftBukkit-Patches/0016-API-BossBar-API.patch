@@ -1,0 +1,172 @@
+From 1c69ceb4cac0ab361c8e223f3785492fedd7d9b9 Mon Sep 17 00:00:00 2001
+From: libhalt <libhalt@libhalt.net>
+Date: Thu, 28 Aug 2014 16:17:25 +0900
+Subject: [PATCH] API: BossBar-API
+
+
+diff --git a/src/main/java/net/minecraft/server/PacketPlayOutSpawnEntityLiving.java b/src/main/java/net/minecraft/server/PacketPlayOutSpawnEntityLiving.java
+new file mode 100644
+index 0000000..cbfaec1
+--- /dev/null
++++ b/src/main/java/net/minecraft/server/PacketPlayOutSpawnEntityLiving.java
+@@ -0,0 +1,108 @@
++package net.minecraft.server;
++
++import java.util.List;
++
++public class PacketPlayOutSpawnEntityLiving extends Packet {
++
++    public int a;//Kyoka
++    public int b;//Kyoka
++    public int c;//Kyoka
++    public int d;//Kyoka
++    public int e;//Kyoka
++    private int f;
++    private int g;
++    private int h;
++    private byte i;
++    private byte j;
++    private byte k;
++    public DataWatcher l;//Kyoka
++    private List m;
++
++    public PacketPlayOutSpawnEntityLiving() {}
++
++    public PacketPlayOutSpawnEntityLiving(EntityLiving entityliving) {
++        this.a = entityliving.getId();
++        this.b = (byte) EntityTypes.a(entityliving);
++        this.c = entityliving.as.a(entityliving.locX);
++        this.d = MathHelper.floor(entityliving.locY * 32.0D);
++        this.e = entityliving.as.a(entityliving.locZ);
++        this.i = (byte) ((int) (entityliving.yaw * 256.0F / 360.0F));
++        this.j = (byte) ((int) (entityliving.pitch * 256.0F / 360.0F));
++        this.k = (byte) ((int) (entityliving.aO * 256.0F / 360.0F));
++        double d0 = 3.9D;
++        double d1 = entityliving.motX;
++        double d2 = entityliving.motY;
++        double d3 = entityliving.motZ;
++
++        if (d1 < -d0) {
++            d1 = -d0;
++        }
++
++        if (d2 < -d0) {
++            d2 = -d0;
++        }
++
++        if (d3 < -d0) {
++            d3 = -d0;
++        }
++
++        if (d1 > d0) {
++            d1 = d0;
++        }
++
++        if (d2 > d0) {
++            d2 = d0;
++        }
++
++        if (d3 > d0) {
++            d3 = d0;
++        }
++
++        this.f = (int) (d1 * 8000.0D);
++        this.g = (int) (d2 * 8000.0D);
++        this.h = (int) (d3 * 8000.0D);
++        this.l = entityliving.getDataWatcher();
++    }
++
++    public void a(PacketDataSerializer packetdataserializer) {
++        this.a = packetdataserializer.a();
++        this.b = packetdataserializer.readByte() & 255;
++        this.c = packetdataserializer.readInt();
++        this.d = packetdataserializer.readInt();
++        this.e = packetdataserializer.readInt();
++        this.i = packetdataserializer.readByte();
++        this.j = packetdataserializer.readByte();
++        this.k = packetdataserializer.readByte();
++        this.f = packetdataserializer.readShort();
++        this.g = packetdataserializer.readShort();
++        this.h = packetdataserializer.readShort();
++        this.m = DataWatcher.b(packetdataserializer);
++    }
++
++    public void b(PacketDataSerializer packetdataserializer) {
++        packetdataserializer.b(this.a);
++        packetdataserializer.writeByte(this.b & 255);
++        packetdataserializer.writeInt(this.c);
++        packetdataserializer.writeInt(this.d);
++        packetdataserializer.writeInt(this.e);
++        packetdataserializer.writeByte(this.i);
++        packetdataserializer.writeByte(this.j);
++        packetdataserializer.writeByte(this.k);
++        packetdataserializer.writeShort(this.f);
++        packetdataserializer.writeShort(this.g);
++        packetdataserializer.writeShort(this.h);
++        this.l.a(packetdataserializer);
++    }
++
++    public void a(PacketPlayOutListener packetplayoutlistener) {
++        packetplayoutlistener.a(this);
++    }
++
++    public String b() {
++        return String.format("id=%d, type=%d, x=%.2f, y=%.2f, z=%.2f, xd=%.2f, yd=%.2f, zd=%.2f", new Object[] { Integer.valueOf(this.a), Integer.valueOf(this.b), Float.valueOf((float) this.c / 32.0F), Float.valueOf((float) this.d / 32.0F), Float.valueOf((float) this.e / 32.0F), Float.valueOf((float) this.f / 8000.0F), Float.valueOf((float) this.g / 8000.0F), Float.valueOf((float) this.h / 8000.0F)});
++    }
++
++    public void handle(PacketListener packetlistener) {
++        this.a((PacketPlayOutListener) packetlistener);
++    }
++}
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+index ab68984..cf210a9 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+@@ -1372,6 +1372,44 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+         public void setRevertedHunger(boolean useOldHunger) {
+             craftPlayer.getHandle().revertedHunger = useOldHunger;
+         }
++
++        @Override
++        public void setBarMessageWithValue(String message, float value) {
++            final int magicalEntityId = 12041212;//Magic!
++            PacketPlayOutSpawnEntityLiving entitySpawnPacket = new PacketPlayOutSpawnEntityLiving();
++            entitySpawnPacket.a = magicalEntityId;
++            entitySpawnPacket.b = 63;
++            entitySpawnPacket.c = (int)getHandle().locX * 32;
++            entitySpawnPacket.d = -200 * 32;
++            entitySpawnPacket.e = (int)getHandle().locZ * 32;
++            entitySpawnPacket.l = getDataWatcher(message , value);
++            getHandle().playerConnection.sendPacket(entitySpawnPacket);
++        }
++
++        @Override
++        public void destroyBarMessage() {
++            final int magicalEntityId = 12041212;//Magic!
++            PacketPlayOutEntityDestroy entityDestroyPacket = new PacketPlayOutEntityDestroy(magicalEntityId);
++            getHandle().playerConnection.sendPacket(entityDestroyPacket);
++        }
++
++        @Override
++        public void updateMessageWithValue(String message, float value) {
++            final int magicalEntityId = 12041212;//Magic!
++            PacketPlayOutEntityMetadata packetEntityMeta = new PacketPlayOutEntityMetadata(magicalEntityId, getDataWatcher(message, value) , true);
++            getHandle().playerConnection.sendPacket(packetEntityMeta);
++        }
++
++        private DataWatcher getDataWatcher(String text, float value){
++            DataWatcher watcher = new DataWatcher(null);
++            watcher.a(0, Byte.valueOf((byte) 32));
++            watcher.a(6, Float.valueOf(Math.max(1, value)));
++            watcher.a(7, Integer.valueOf(0));
++            watcher.a(8, Byte.valueOf((byte) 0));
++            watcher.a(10, text);
++            watcher.a(11, Byte.valueOf((byte) 1));
++            return watcher;
++        }
+     };
+ 
+     public Kyoka kyoka() {
+-- 
+1.9.4.msysgit.1
+
