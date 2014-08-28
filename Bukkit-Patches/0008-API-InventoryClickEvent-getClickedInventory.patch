@@ -1,0 +1,70 @@
+From 167e2524553a7b163a7f31354d2a1c702c019306 Mon Sep 17 00:00:00 2001
+From: Christian Nielsen <professiionaal@gmail.com>
+Date: Thu, 28 Aug 2014 00:31:42 -0400
+Subject: [PATCH] API: InventoryClickEvent - getClickedInventory
+
+
+diff --git a/src/main/java/org/bukkit/event/inventory/InventoryClickEvent.java b/src/main/java/org/bukkit/event/inventory/InventoryClickEvent.java
+index 28198b8..5c2fe71 100644
+--- a/src/main/java/org/bukkit/event/inventory/InventoryClickEvent.java
++++ b/src/main/java/org/bukkit/event/inventory/InventoryClickEvent.java
+@@ -1,15 +1,15 @@
+ package org.bukkit.event.inventory;
+ 
+-import org.bukkit.inventory.Inventory;
+-import org.bukkit.inventory.InventoryView;
++import org.bukkit.Location;
+ import org.bukkit.entity.HumanEntity;
+ import org.bukkit.entity.Player;
+ import org.bukkit.event.HandlerList;
+ import org.bukkit.event.inventory.InventoryType.SlotType;
+-import org.bukkit.Location;
++import org.bukkit.inventory.Inventory;
++import org.bukkit.inventory.InventoryView;
+ import org.bukkit.inventory.ItemStack;
+-import org.bukkit.scheduler.BukkitScheduler;
+ import org.bukkit.plugin.Plugin;
++import org.bukkit.scheduler.BukkitScheduler;
+ 
+ /**
+  * This event is called when a player clicks a slot in an inventory.
+@@ -47,6 +47,7 @@ public class InventoryClickEvent extends InventoryInteractEvent {
+     private static final HandlerList handlers = new HandlerList();
+     private final ClickType click;
+     private final InventoryAction action;
++    private final Inventory clickedInventory;
+     private SlotType slot_type;
+     private int whichSlot;
+     private int rawSlot;
+@@ -62,6 +63,13 @@ public class InventoryClickEvent extends InventoryInteractEvent {
+         super(view);
+         this.slot_type = type;
+         this.rawSlot = slot;
++        if (slot < 0) {
++            this.clickedInventory = null;
++        } else if (view.getTopInventory() != null && slot < view.getTopInventory().getSize()) {
++            this.clickedInventory = view.getTopInventory();
++        } else {
++            this.clickedInventory = view.getBottomInventory();
++        }
+         this.whichSlot = view.convertSlot(slot);
+         this.click = click;
+         this.action = action;
+@@ -73,6 +81,14 @@ public class InventoryClickEvent extends InventoryInteractEvent {
+     }
+ 
+     /**
++     * Gets the inventory that was clicked, or null if outside of the window.
++     * @return The clicked inventory
++     */
++    public Inventory getClickedInventory() {
++        return clickedInventory;
++    }
++    
++    /**
+      * Gets the type of slot that was clicked.
+      *
+      * @return the slot type
+-- 
+1.9.4.msysgit.0
+
