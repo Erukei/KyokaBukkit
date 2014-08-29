@@ -1,7 +1,7 @@
-From 126351145ccb577385d2709895b9409f85dd12d2 Mon Sep 17 00:00:00 2001
+From 823b17fa1489b4dec1a57f8a5f38ebf1994ec56d Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Sun, 24 Aug 2014 16:59:28 +1000
-Subject: [PATCH] FEAT: Configurable despawn ticks for arrows/items
+Subject: [PATCH] FEAT: API for item despawn time and make it configurable
 
 
 diff --git a/src/main/java/com/erukei/kyoka/KyokaConfig.java b/src/main/java/com/erukei/kyoka/KyokaConfig.java
@@ -54,7 +54,7 @@ index c0cdd61..25fcb5f 100644
                  }
              } else {
 diff --git a/src/main/java/net/minecraft/server/EntityItem.java b/src/main/java/net/minecraft/server/EntityItem.java
-index 6e97ca4..fa335fc 100644
+index 6e97ca4..6b16ece 100644
 --- a/src/main/java/net/minecraft/server/EntityItem.java
 +++ b/src/main/java/net/minecraft/server/EntityItem.java
 @@ -2,6 +2,7 @@ package net.minecraft.server;
@@ -65,15 +65,53 @@ index 6e97ca4..fa335fc 100644
  import org.apache.logging.log4j.LogManager;
  import org.apache.logging.log4j.Logger;
  
-@@ -106,7 +107,7 @@ public class EntityItem extends Entity {
+@@ -19,6 +20,7 @@ public class EntityItem extends Entity {
+     public float c;
+     private int lastTick = MinecraftServer.currentTick; // CraftBukkit
+     public Entity owner; // Kyoka
++    public int despawnTicks = KyokaConfig.itemDespawnTicks; // Kyoka
+ 
+     public EntityItem(World world, double d0, double d1, double d2) {
+         super(world);
+@@ -106,7 +108,7 @@ public class EntityItem extends Entity {
              }
  
              // ++this.age; // CraftBukkit - Moved up
 -            if (!this.world.isStatic && this.age >= 6000) {
-+            if (!this.world.isStatic && this.age >= KyokaConfig.itemDespawnTicks) {
++            if (!this.world.isStatic && this.age >= despawnTicks) {
                  // CraftBukkit start - fire ItemDespawnEvent
                  if (org.bukkit.craftbukkit.event.CraftEventFactory.callItemDespawnEvent(this).isCancelled()) {
                      this.age = 0;
+@@ -323,7 +325,7 @@ public class EntityItem extends Entity {
+     public ItemStack getItemStack() {
+         ItemStack itemstack = this.getDataWatcher().getItemStack(10);
+ 
+-        return itemstack == null ? new ItemStack(Blocks.STONE) : itemstack; 
++        return itemstack == null ? new ItemStack(Blocks.STONE) : itemstack;
+     }
+ 
+     public void setItemStack(ItemStack itemstack) {
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftItem.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftItem.java
+index 02b32cf..4394cd6 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftItem.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftItem.java
+@@ -45,4 +45,16 @@ public class CraftItem extends CraftEntity implements Item {
+     public EntityType getType() {
+         return EntityType.DROPPED_ITEM;
+     }
++
++    // Kyoka start
++    @Override
++    public int getDespawnTicks() {
++        return item.despawnTicks;
++    }
++
++    @Override
++    public void setDespawnTicks(int despawnTicks) {
++        item.despawnTicks = despawnTicks;
++    }
++    // Kyoka end
+ }
 -- 
 1.9.1
 

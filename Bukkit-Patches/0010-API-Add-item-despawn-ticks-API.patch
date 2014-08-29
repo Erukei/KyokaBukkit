@@ -1,0 +1,33 @@
+From 2abd1ad15c4860e82c9b7eee833431ad7c9894e9 Mon Sep 17 00:00:00 2001
+From: Jamie Shaw <lk@lkay.org>
+Date: Sat, 30 Aug 2014 02:35:43 +1000
+Subject: [PATCH] API: Add item despawn ticks API
+
+
+diff --git a/src/main/java/org/bukkit/entity/Item.java b/src/main/java/org/bukkit/entity/Item.java
+index 90260b7..77e4a25 100644
+--- a/src/main/java/org/bukkit/entity/Item.java
++++ b/src/main/java/org/bukkit/entity/Item.java
+@@ -34,4 +34,19 @@ public interface Item extends Entity {
+      * @param delay New delay
+      */
+     public void setPickupDelay(int delay);
++
++    // Kyoka start
++
++    /**
++     * Get item despawn ticks
++     * @return Total lifespan of the item, tick-wise
++     */
++    public int getDespawnTicks();
++
++    /**
++     * Set item's total lifespan ticks
++     * @param despawnTicks Total lifespan of the item, tick-wise
++     */
++    public void setDespawnTicks(int despawnTicks);
++    // Kyoka end
+ }
+-- 
+1.9.1
+
