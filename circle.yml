@@ -5,10 +5,9 @@ checkout:
 dependencies:
   override:
     - mvn install
+  post:
+    - cp Kyoka-API/target/kyoka*.jar $CIRCLE_ARTIFACTS/
+    - cp Kyoka-Server/target/kyoka*.jar $CIRCLE_ARTIFACTS/
 test:
   override:
     - echo 'skipping'
-general:
-  artifacts:
-    - "Kyoka-API/target/"
-    - "Kyoka-Server/target/"
