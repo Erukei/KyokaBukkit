@@ -4,6 +4,9 @@ ORIG_PWD="$(pwd)"
 cd "$(dirname "$0")"
 echo "  Rebuilding forked projects.... "
 
+git config user.email "this.is.notreal@fa.kez"
+git config user.name "asdf"
+
 function applyPatches {
     what=base/$1
     target=$2

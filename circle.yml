@@ -1,6 +1,4 @@
 checkout:
   post:
     - git submodule update --init
-    - git config user.email "this.is.notreal@fa.kez"
-    - git config user.name "asdf"
     - ./applyPatches.sh
