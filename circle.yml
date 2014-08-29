@@ -1,0 +1,4 @@
+checkout:
+  pre:
+    - git submodule update --init
+    - ./appyPatches.sh

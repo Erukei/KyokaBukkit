@@ -1,4 +1,4 @@
-KyokaBukkit [![Build Status](https://drone.io/github.com/Erukei/KyokaBukkit/status.png)](https://drone.io/github.com/Erukei/KyokaBukkit/latest)
+[![Circle CI](https://circleci.com/gh/Erukei/KyokaBukkit.png?style=badge)](https://circleci.com/gh/Erukei/KyokaBukkit)
 ===========
 A set of patches to Bukkit focusing on API enchancements and performance.
 
