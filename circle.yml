@@ -1,5 +1,4 @@
 checkout:
-  pre:
-    - cd ~/KyokaBukkit/
+  post:
     - git submodule update --init
     - ./appyPatches.sh
