@@ -2,3 +2,9 @@ checkout:
   post:
     - git submodule update --init
     - ./applyPatches.sh
+dependencies:
+  override:
+    - mvn install
+test:
+  override:
+    - true
