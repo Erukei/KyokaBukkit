@@ -10,5 +10,5 @@ test:
     - echo 'skipping'
 general:
   artifacts:
-    - "Kyoka-API/target/kyoka*"
-    - "Kyoka-Server/target/kyoka*"
+    - "Kyoka-API/target/"
+    - "Kyoka-Server/target/"
