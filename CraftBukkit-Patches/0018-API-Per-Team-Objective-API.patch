@@ -1,0 +1,203 @@
+From 15bb88f72a9bfc961a6d589394bb067ec0674eac Mon Sep 17 00:00:00 2001
+From: libhalt <libhalt@libhalt.net>
+Date: Sun, 31 Aug 2014 01:43:37 +0900
+Subject: [PATCH] API: Allow Objective to be per Team for SideBar purposes
+
+
+diff --git a/src/main/java/net/minecraft/server/PacketPlayOutScoreboardScore.java b/src/main/java/net/minecraft/server/PacketPlayOutScoreboardScore.java
+new file mode 100644
+index 0000000..d1ad8dc
+--- /dev/null
++++ b/src/main/java/net/minecraft/server/PacketPlayOutScoreboardScore.java
+@@ -0,0 +1,53 @@
++package net.minecraft.server;
++
++import java.io.IOException;
++
++public class PacketPlayOutScoreboardScore extends Packet {
++
++    public String a = "";//Kyoka
++    public String b = "";//Kyoka
++    private int c;
++    private int d;
++
++    public PacketPlayOutScoreboardScore() {}
++
++    public PacketPlayOutScoreboardScore(ScoreboardScore scoreboardscore, int i) {
++        this.a = scoreboardscore.getPlayerName();
++        this.b = scoreboardscore.getObjective().getName();
++        this.c = scoreboardscore.getScore();
++        this.d = i;
++    }
++
++    public PacketPlayOutScoreboardScore(String s) {
++        this.a = s;
++        this.b = "";
++        this.c = 0;
++        this.d = 1;
++    }
++
++    public void a(PacketDataSerializer packetdataserializer) throws IOException{
++        this.a = packetdataserializer.c(16);
++        this.d = packetdataserializer.readByte();
++        if (this.d != 1) {
++            this.b = packetdataserializer.c(16);
++            this.c = packetdataserializer.readInt();
++        }
++    }
++
++    public void b(PacketDataSerializer packetdataserializer) throws IOException{
++        packetdataserializer.a(this.a);
++        packetdataserializer.writeByte(this.d);
++        if (this.d != 1) {
++            packetdataserializer.a(this.b);
++            packetdataserializer.writeInt(this.c);
++        }
++    }
++
++    public void a(PacketPlayOutListener packetplayoutlistener) {
++        packetplayoutlistener.a(this);
++    }
++
++    public void handle(PacketListener packetlistener) {
++        this.a((PacketPlayOutListener) packetlistener);
++    }
++}
+diff --git a/src/main/java/net/minecraft/server/ScoreboardObjective.java b/src/main/java/net/minecraft/server/ScoreboardObjective.java
+new file mode 100644
+index 0000000..bc5ef5b
+--- /dev/null
++++ b/src/main/java/net/minecraft/server/ScoreboardObjective.java
+@@ -0,0 +1,34 @@
++package net.minecraft.server;
++
++public class ScoreboardObjective {
++
++    private final Scoreboard a;
++    private final String b;
++    private final IScoreboardCriteria c;
++    private String d;
++    public boolean isTeamSpecific = false;//Kyoka
++
++    public ScoreboardObjective(Scoreboard scoreboard, String s, IScoreboardCriteria iscoreboardcriteria) {
++        this.a = scoreboard;
++        this.b = s;
++        this.c = iscoreboardcriteria;
++        this.d = s;
++    }
++
++    public String getName() {
++        return this.b;
++    }
++
++    public IScoreboardCriteria getCriteria() {
++        return this.c;
++    }
++
++    public String getDisplayName() {
++        return this.d;
++    }
++
++    public void setDisplayName(String s) {
++        this.d = s;
++        this.a.handleObjectiveChanged(this);
++    }
++}
+diff --git a/src/main/java/net/minecraft/server/ScoreboardServer.java b/src/main/java/net/minecraft/server/ScoreboardServer.java
+index 1591058..be2e236 100644
+--- a/src/main/java/net/minecraft/server/ScoreboardServer.java
++++ b/src/main/java/net/minecraft/server/ScoreboardServer.java
+@@ -158,6 +158,9 @@ public class ScoreboardServer extends Scoreboard {
+             while (iterator1.hasNext()) {
+                 Packet packet = (Packet) iterator1.next();
+ 
++                if(packet instanceof PacketPlayOutScoreboardScore){
++                    sendPlayer(entityplayer, (PacketPlayOutScoreboardScore) packet);
++                }else
+                 entityplayer.playerConnection.sendPacket(packet);
+             }
+         }
+@@ -209,6 +212,53 @@ public class ScoreboardServer extends Scoreboard {
+ 
+         return i;
+     }
++    //Kyoka start
++    private void sendPlayer(EntityPlayer entityplayer , PacketPlayOutScoreboardScore packet){
++        String playerName = packet.a;
++        String objectName = packet.b;
++        ScoreboardObjective objective = this.getObjective(objectName);
++        if(objective.isTeamSpecific){
++            EntityPlayer owner = a.getPlayerList().getPlayer(playerName);
++            if(owner != null){
++                if(entityplayer.getScoreboardTeam() != null && entityplayer.getScoreboardTeam().equals(owner.getScoreboardTeam())){
++                    entityplayer.playerConnection.sendPacket(packet);
++                }
++            }else{
++                ScoreboardTeam team = entityplayer.getScoreboard().getPlayerTeam(entityplayer.getName());
++                if (team != null &&  team.getPlayerNameSet().contains(playerName)) {
++                    entityplayer.playerConnection.sendPacket(packet);
++                }
++            }
++        }else{
++            entityplayer.playerConnection.sendPacket(packet);
++        }
++    }
++    private void sendAll(PacketPlayOutScoreboardScore packet){
++        String playerName = packet.a;
++        String objectName = packet.b;
++        ScoreboardObjective objective = this.getObjective(objectName);
++        if(objective.isTeamSpecific){
++            EntityPlayer owner = a.getPlayerList().getPlayer(playerName);
++            if(owner != null){
++                for (EntityPlayer entityplayer : (List<EntityPlayer>) this.a.getPlayerList().players) {
++                    if (entityplayer.getScoreboardTeam() != null && entityplayer.getScoreboardTeam().equals(owner.getScoreboardTeam())) {
++                        entityplayer.playerConnection.sendPacket(packet);
++                    }
++                }
++            }else{
++                for (EntityPlayer entityplayer : (List<EntityPlayer>) this.a.getPlayerList().players) {
++                    ScoreboardTeam team = entityplayer.getScoreboard().getPlayerTeam(entityplayer.getName());
++                    if (team != null &&  team.getPlayerNameSet().contains(playerName)) {
++                        entityplayer.playerConnection.sendPacket(packet);
++                    }
++                }
++            }
++        }else{
++            sendAll((Packet)packet);
++        }
++    }
++    //Kyoka end
++
+ 
+     // CraftBukkit start - Send to players
+     private void sendAll(Packet packet) {
+diff --git a/src/main/java/org/bukkit/craftbukkit/scoreboard/CraftObjective.java b/src/main/java/org/bukkit/craftbukkit/scoreboard/CraftObjective.java
+index 9eaec71..58f60fb 100644
+--- a/src/main/java/org/bukkit/craftbukkit/scoreboard/CraftObjective.java
++++ b/src/main/java/org/bukkit/craftbukkit/scoreboard/CraftObjective.java
+@@ -100,6 +100,22 @@ final class CraftObjective extends CraftScoreboardComponent implements Objective
+         return new CraftScore(this, entry);
+     }
+ 
++    private final Kyoka kyoka = new Kyoka(){
++        @Override
++        public void setTeamSpecific(boolean specific) {
++            objective.isTeamSpecific = specific;
++        }
++
++        @Override
++        public boolean isTeamSpecific() {
++            return objective.isTeamSpecific;
++        }
++    };
++    @Override
++    public Kyoka kyoka() {
++        return kyoka;
++    }
++
+     @Override
+     public void unregister() throws IllegalStateException {
+         CraftScoreboard scoreboard = checkState();
+-- 
+1.9.4.msysgit.1
+
