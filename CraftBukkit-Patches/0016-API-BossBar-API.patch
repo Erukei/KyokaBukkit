@@ -1,4 +1,4 @@
-From 1c69ceb4cac0ab361c8e223f3785492fedd7d9b9 Mon Sep 17 00:00:00 2001
+From 0e649711b1b26fb2b7e3b0addd5a911dab1c8894 Mon Sep 17 00:00:00 2001
 From: libhalt <libhalt@libhalt.net>
 Date: Thu, 28 Aug 2014 16:17:25 +0900
 Subject: [PATCH] API: BossBar-API
@@ -119,42 +119,41 @@ index 0000000..cbfaec1
 +    }
 +}
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index ab68984..cf210a9 100644
+index ab68984..ffa88f4 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -1372,6 +1372,44 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -1372,6 +1372,43 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          public void setRevertedHunger(boolean useOldHunger) {
              craftPlayer.getHandle().revertedHunger = useOldHunger;
          }
 +
++        private static final int BAR_DRAGON_ENTITY_ID = 12041212;
 +        @Override
 +        public void setBarMessageWithValue(String message, float value) {
-+            final int magicalEntityId = 12041212;//Magic!
 +            PacketPlayOutSpawnEntityLiving entitySpawnPacket = new PacketPlayOutSpawnEntityLiving();
-+            entitySpawnPacket.a = magicalEntityId;
++            entitySpawnPacket.a = BAR_DRAGON_ENTITY_ID;
 +            entitySpawnPacket.b = 63;
 +            entitySpawnPacket.c = (int)getHandle().locX * 32;
 +            entitySpawnPacket.d = -200 * 32;
 +            entitySpawnPacket.e = (int)getHandle().locZ * 32;
-+            entitySpawnPacket.l = getDataWatcher(message , value);
++            entitySpawnPacket.l = getEnderDragonDataWatcher(message , value);
 +            getHandle().playerConnection.sendPacket(entitySpawnPacket);
 +        }
 +
 +        @Override
 +        public void destroyBarMessage() {
-+            final int magicalEntityId = 12041212;//Magic!
-+            PacketPlayOutEntityDestroy entityDestroyPacket = new PacketPlayOutEntityDestroy(magicalEntityId);
++            PacketPlayOutEntityDestroy entityDestroyPacket = new PacketPlayOutEntityDestroy(BAR_DRAGON_ENTITY_ID);
 +            getHandle().playerConnection.sendPacket(entityDestroyPacket);
 +        }
 +
 +        @Override
 +        public void updateMessageWithValue(String message, float value) {
-+            final int magicalEntityId = 12041212;//Magic!
-+            PacketPlayOutEntityMetadata packetEntityMeta = new PacketPlayOutEntityMetadata(magicalEntityId, getDataWatcher(message, value) , true);
++            PacketPlayOutEntityMetadata packetEntityMeta = new PacketPlayOutEntityMetadata(BAR_DRAGON_ENTITY_ID, getEnderDragonDataWatcher(message, value) , true);
 +            getHandle().playerConnection.sendPacket(packetEntityMeta);
 +        }
 +
-+        private DataWatcher getDataWatcher(String text, float value){
++        private DataWatcher getEnderDragonDataWatcher(String text, float value){
++            //Why? using wrapper class CLARIFY which object we are using and wont use wrong object due to ambiguous Object Parameter
 +            DataWatcher watcher = new DataWatcher(null);
 +            watcher.a(0, Byte.valueOf((byte) 32));
 +            watcher.a(6, Float.valueOf(Math.max(1, value)));
