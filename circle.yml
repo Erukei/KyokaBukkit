@@ -1,6 +1,8 @@
 checkout:
   post:
     - git submodule update --init
+    - git config --global user.email "this.is.notreal@fa.kez"
+    - git config --global user.name "asdf"
     - ./applyPatches.sh
 dependencies:
   override:
