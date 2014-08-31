@@ -1,4 +1,4 @@
-From f66de31378cea0a89844d134fd367fc9b30912a4 Mon Sep 17 00:00:00 2001
+From 6e216820d3888323edc427514ed057fe0a43a6cd Mon Sep 17 00:00:00 2001
 From: libhalt <libhalt@libhalt.net>
 Date: Sun, 31 Aug 2014 01:43:37 +0900
 Subject: [PATCH] API: Allow Objective to be per Team for SideBar purposes
@@ -63,6 +63,18 @@ index 0000000..d1ad8dc
 +        this.a((PacketPlayOutListener) packetlistener);
 +    }
 +}
+diff --git a/src/main/java/net/minecraft/server/PlayerList.java b/src/main/java/net/minecraft/server/PlayerList.java
+index 7c4a73c..fdb8683 100644
+--- a/src/main/java/net/minecraft/server/PlayerList.java
++++ b/src/main/java/net/minecraft/server/PlayerList.java
+@@ -187,6 +187,7 @@ public abstract class PlayerList {
+                 while (iterator1.hasNext()) {
+                     Packet packet = (Packet) iterator1.next();
+ 
++                    if(packet instanceof PacketPlayOutScoreboardScore)scoreboardserver.sendPlayer(entityplayer , (PacketPlayOutScoreboardScore) packet);else
+                     entityplayer.playerConnection.sendPacket(packet);
+                 }
+ 
 diff --git a/src/main/java/net/minecraft/server/ScoreboardObjective.java b/src/main/java/net/minecraft/server/ScoreboardObjective.java
 new file mode 100644
 index 0000000..bc5ef5b
