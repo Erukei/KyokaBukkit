@@ -1,4 +1,4 @@
-From 15bb88f72a9bfc961a6d589394bb067ec0674eac Mon Sep 17 00:00:00 2001
+From f66de31378cea0a89844d134fd367fc9b30912a4 Mon Sep 17 00:00:00 2001
 From: libhalt <libhalt@libhalt.net>
 Date: Sun, 31 Aug 2014 01:43:37 +0900
 Subject: [PATCH] API: Allow Objective to be per Team for SideBar purposes
@@ -104,10 +104,28 @@ index 0000000..bc5ef5b
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/server/ScoreboardServer.java b/src/main/java/net/minecraft/server/ScoreboardServer.java
-index 1591058..be2e236 100644
+index 1591058..3cf0a5d 100644
 --- a/src/main/java/net/minecraft/server/ScoreboardServer.java
 +++ b/src/main/java/net/minecraft/server/ScoreboardServer.java
-@@ -158,6 +158,9 @@ public class ScoreboardServer extends Scoreboard {
+@@ -70,6 +70,17 @@ public class ScoreboardServer extends Scoreboard {
+     public void removePlayerFromTeam(String s, ScoreboardTeam scoreboardteam) {
+         super.removePlayerFromTeam(s, scoreboardteam);
+         this.sendAll(new PacketPlayOutScoreboardTeam(scoreboardteam, Arrays.asList(new String[] { s}), 4)); // CraftBukkit - Internal packet method
++        for(ScoreboardObjective objective :  (java.util.Collection<ScoreboardObjective>) getObjectives()){
++            if(objective.isTeamSpecific){
++                PacketPlayOutScoreboardScore packetScoreboardObject = new PacketPlayOutScoreboardScore( getPlayerScoreForObjective(s , objective) ,1);
++                EntityPlayer leaver = a.getPlayerList().getPlayer(s);
++                for(String string : (java.util.Collection<String>) scoreboardteam.getPlayerNameSet()){
++                    EntityPlayer member = a.getPlayerList().getPlayer(string);
++                    if(member != null)member.playerConnection.sendPacket(packetScoreboardObject);
++                    if(leaver != null)leaver.playerConnection.sendPacket(new PacketPlayOutScoreboardScore( getPlayerScoreForObjective(string , objective) ,1));
++                }
++            }
++        }
+         this.b();
+     }
+ 
+@@ -158,6 +169,9 @@ public class ScoreboardServer extends Scoreboard {
              while (iterator1.hasNext()) {
                  Packet packet = (Packet) iterator1.next();
  
@@ -117,7 +135,7 @@ index 1591058..be2e236 100644
                  entityplayer.playerConnection.sendPacket(packet);
              }
          }
-@@ -209,6 +212,53 @@ public class ScoreboardServer extends Scoreboard {
+@@ -209,6 +223,53 @@ public class ScoreboardServer extends Scoreboard {
  
          return i;
      }
