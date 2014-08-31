@@ -1,4 +1,4 @@
-From 6e216820d3888323edc427514ed057fe0a43a6cd Mon Sep 17 00:00:00 2001
+From 796e4c6b8ec5676ab3ecb45f764e64282a554eb4 Mon Sep 17 00:00:00 2001
 From: libhalt <libhalt@libhalt.net>
 Date: Sun, 31 Aug 2014 01:43:37 +0900
 Subject: [PATCH] API: Allow Objective to be per Team for SideBar purposes
@@ -116,7 +116,7 @@ index 0000000..bc5ef5b
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/server/ScoreboardServer.java b/src/main/java/net/minecraft/server/ScoreboardServer.java
-index 1591058..3cf0a5d 100644
+index 1591058..f90accd 100644
 --- a/src/main/java/net/minecraft/server/ScoreboardServer.java
 +++ b/src/main/java/net/minecraft/server/ScoreboardServer.java
 @@ -70,6 +70,17 @@ public class ScoreboardServer extends Scoreboard {
@@ -137,22 +137,20 @@ index 1591058..3cf0a5d 100644
          this.b();
      }
  
-@@ -158,6 +169,9 @@ public class ScoreboardServer extends Scoreboard {
+@@ -158,6 +169,7 @@ public class ScoreboardServer extends Scoreboard {
              while (iterator1.hasNext()) {
                  Packet packet = (Packet) iterator1.next();
  
-+                if(packet instanceof PacketPlayOutScoreboardScore){
-+                    sendPlayer(entityplayer, (PacketPlayOutScoreboardScore) packet);
-+                }else
++                if(packet instanceof PacketPlayOutScoreboardScore)sendPlayer(entityplayer, (PacketPlayOutScoreboardScore) packet);else
                  entityplayer.playerConnection.sendPacket(packet);
              }
          }
-@@ -209,6 +223,53 @@ public class ScoreboardServer extends Scoreboard {
+@@ -209,6 +221,53 @@ public class ScoreboardServer extends Scoreboard {
  
          return i;
      }
 +    //Kyoka start
-+    private void sendPlayer(EntityPlayer entityplayer , PacketPlayOutScoreboardScore packet){
++    public void sendPlayer(EntityPlayer entityplayer , PacketPlayOutScoreboardScore packet){
 +        String playerName = packet.a;
 +        String objectName = packet.b;
 +        ScoreboardObjective objective = this.getObjective(objectName);
