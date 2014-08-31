@@ -1,4 +1,4 @@
-From 8d48cf3a766fbecc81c207d9d585a79e4d5183bc Mon Sep 17 00:00:00 2001
+From db1099f68a92a9e43a9a1f673be2aa8059f9d01a Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Sat, 23 Aug 2014 20:10:36 +1000
 Subject: [PATCH] API: Custom effects for LivingEntities
@@ -323,7 +323,7 @@ index 0000000..2e9f192
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/server/MobEffectList.java b/src/main/java/net/minecraft/server/MobEffectList.java
-index 6ec03bb..adcbc09 100644
+index 6ec03bb..3880210 100644
 --- a/src/main/java/net/minecraft/server/MobEffectList.java
 +++ b/src/main/java/net/minecraft/server/MobEffectList.java
 @@ -8,6 +8,7 @@ import java.util.Map.Entry;
@@ -401,8 +401,8 @@ index 6ec03bb..adcbc09 100644
              if (this.id == HARM.id && !entityliving1.aR() || this.id == HEAL.id && entityliving1.aR()) {
 -                j = (int) (d0 * (double) (6 << i) + 0.5D);
 +                // Kyoka start
-+                if(entityliving.hasCustomEffectAmount(this.id)) {
-+                    j = (int) (d0 * (double) (entityliving.getEffectAmount(this.id) << i) + 0.5D);
++                if(entityliving1.hasCustomEffectAmount(this.id)) {
++                    j = (int) (d0 * (double) (entityliving1.getEffectAmount(this.id) << i) + 0.5D);
 +                } else {
 +                    j = (int) (d0 * (double) (6 << i) + 0.5D);
 +                }
@@ -416,8 +416,8 @@ index 6ec03bb..adcbc09 100644
          } else {
 -            j = (int) (d0 * (double) (4 << i) + 0.5D);
 +            // Kyoka start
-+            if(entityliving.hasCustomEffectAmount(this.id)) {
-+                j = (int) (d0 * (double) (entityliving.getEffectAmount(this.id) << i) + 0.5D);
++            if(entityliving1.hasCustomEffectAmount(this.id)) {
++                j = (int) (d0 * (double) (entityliving1.getEffectAmount(this.id) << i) + 0.5D);
 +            } else {
 +                j = (int) (d0 * (double) (4 << i) + 0.5D);
 +            }
