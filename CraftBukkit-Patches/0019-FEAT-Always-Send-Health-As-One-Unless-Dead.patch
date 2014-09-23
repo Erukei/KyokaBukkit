@@ -1,0 +1,141 @@
+From 5d59dbc210815b8d35a57ba2dc0b19ff81f857ec Mon Sep 17 00:00:00 2001
+From: libhalt <libhalt@libhalt.net>
+Date: Mon, 22 Sep 2014 15:04:29 +0900
+Subject: [PATCH] FEAT: Don't send health information unless dead
+
+---
+ src/main/java/net/minecraft/server/DataWatcher.java    | 18 +++++++++++-------
+ .../minecraft/server/PacketPlayOutEntityMetadata.java  |  7 ++++---
+ .../server/PacketPlayOutSpawnEntityLiving.java         |  2 +-
+ .../java/net/minecraft/server/PlayerConnection.java    |  9 +++++++++
+ 4 files changed, 25 insertions(+), 11 deletions(-)
+
+diff --git a/src/main/java/net/minecraft/server/DataWatcher.java b/src/main/java/net/minecraft/server/DataWatcher.java
+index f7e50fc..1b0c900 100644
+--- a/src/main/java/net/minecraft/server/DataWatcher.java
++++ b/src/main/java/net/minecraft/server/DataWatcher.java
+@@ -148,10 +148,10 @@ public class DataWatcher {
+ 
+     // Spigot start - protocol patch
+     public static void a(List list, PacketDataSerializer packetdataserializer) throws java.io.IOException { // CraftBukkit - added throws
+-        a(list, packetdataserializer, 5);
++        a(list, packetdataserializer, 5 , false);
+     }
+ 
+-    public static void a(List list, PacketDataSerializer packetdataserializer, int version) throws java.io.IOException {
++    public static void a(List list, PacketDataSerializer packetdataserializer, int version , boolean obfuscate) throws java.io.IOException {
+     // Spigot end - protocol patch
+         if (list != null) {
+             Iterator iterator = list.iterator();
+@@ -159,7 +159,7 @@ public class DataWatcher {
+             while (iterator.hasNext()) {
+                 WatchableObject watchableobject = (WatchableObject) iterator.next();
+ 
+-                a(packetdataserializer, watchableobject, version); // Spigot
++                a(packetdataserializer, watchableobject, version , obfuscate); // Spigot
+             }
+         }
+ 
+@@ -195,10 +195,10 @@ public class DataWatcher {
+ 
+     // Spigot start - protocol patch
+     public void a(PacketDataSerializer packetdataserializer) throws java.io.IOException { // CraftBukkit - added throws
+-        a(packetdataserializer, 5);
++        a(packetdataserializer, 5 , false);
+     }
+ 
+-    public void a(PacketDataSerializer packetdataserializer, int version) throws java.io.IOException {
++    public void a(PacketDataSerializer packetdataserializer, int version , boolean obfuscate) throws java.io.IOException {
+     // Spigot end
+         this.f.readLock().lock();
+         Iterator iterator = this.dataValues.valueCollection().iterator(); // Spigot
+@@ -206,7 +206,7 @@ public class DataWatcher {
+         while (iterator.hasNext()) {
+             WatchableObject watchableobject = (WatchableObject) iterator.next();
+ 
+-            a(packetdataserializer, watchableobject, version); // Spigot
++            a(packetdataserializer, watchableobject, version , obfuscate); // Spigot
+         }
+ 
+         this.f.readLock().unlock();
+@@ -225,7 +225,7 @@ public class DataWatcher {
+     }
+ 
+     // Spigot start - protocol patch
+-    private static void a(PacketDataSerializer packetdataserializer, WatchableObject watchableobject, int version) throws java.io.IOException { // CraftBukkit - added throws
++    private static void a(PacketDataSerializer packetdataserializer, WatchableObject watchableobject, int version , boolean obfuscate) throws java.io.IOException { // CraftBukkit - added throws
+         int type = watchableobject.c();
+         if (watchableobject.b() instanceof ProtocolData.ByteShort && version >= 16) {
+             type = 1;
+@@ -263,6 +263,10 @@ public class DataWatcher {
+             break;
+ 
+         case 3:
++            if(obfuscate && watchableobject.a() == 6){
++                packetdataserializer.writeFloat(((Number) watchableobject.b()).floatValue() == 0.0F ? 0.0F : 1.0F);
++                break;
++            }
+             packetdataserializer.writeFloat(((Number) watchableobject.b()).floatValue());
+             break;
+ 
+diff --git a/src/main/java/net/minecraft/server/PacketPlayOutEntityMetadata.java b/src/main/java/net/minecraft/server/PacketPlayOutEntityMetadata.java
+index b2a3f61..be8cfae 100644
+--- a/src/main/java/net/minecraft/server/PacketPlayOutEntityMetadata.java
++++ b/src/main/java/net/minecraft/server/PacketPlayOutEntityMetadata.java
+@@ -4,8 +4,9 @@ import java.util.List;
+ 
+ public class PacketPlayOutEntityMetadata extends Packet {
+ 
+-    private int a;
+-    private List b;
++    public int a;
++    public List b;
++    public boolean obfuscate = true;
+ 
+     public PacketPlayOutEntityMetadata() {}
+ 
+@@ -39,7 +40,7 @@ public class PacketPlayOutEntityMetadata extends Packet {
+         {
+             packetdataserializer.b( a );
+         }
+-        DataWatcher.a(this.b, packetdataserializer, packetdataserializer.version);
++        DataWatcher.a(this.b, packetdataserializer, packetdataserializer.version , obfuscate);
+         // Spigot end
+     }
+ 
+diff --git a/src/main/java/net/minecraft/server/PacketPlayOutSpawnEntityLiving.java b/src/main/java/net/minecraft/server/PacketPlayOutSpawnEntityLiving.java
+index 9a70017..dbe8579 100644
+--- a/src/main/java/net/minecraft/server/PacketPlayOutSpawnEntityLiving.java
++++ b/src/main/java/net/minecraft/server/PacketPlayOutSpawnEntityLiving.java
+@@ -91,7 +91,7 @@ public class PacketPlayOutSpawnEntityLiving extends Packet {
+         packetdataserializer.writeShort(this.f);
+         packetdataserializer.writeShort(this.g);
+         packetdataserializer.writeShort(this.h);
+-        this.l.a(packetdataserializer, packetdataserializer.version); // Spigot
++        this.l.a(packetdataserializer, packetdataserializer.version , true); // Spigot
+     }
+ 
+     public void a(PacketPlayOutListener packetplayoutlistener) {
+diff --git a/src/main/java/net/minecraft/server/PlayerConnection.java b/src/main/java/net/minecraft/server/PlayerConnection.java
+index d7d3916..48b7b0d 100644
+--- a/src/main/java/net/minecraft/server/PlayerConnection.java
++++ b/src/main/java/net/minecraft/server/PlayerConnection.java
+@@ -764,6 +764,15 @@ public class PlayerConnection implements PacketPlayInListener {
+         } else if (packet instanceof PacketPlayOutSpawnPosition) {
+             PacketPlayOutSpawnPosition packet6 = (PacketPlayOutSpawnPosition) packet;
+             this.player.compassTarget = new Location(this.getPlayer().getWorld(), packet6.x, packet6.y, packet6.z);
++        } else if (packet instanceof PacketPlayOutEntityMetadata){
++            PacketPlayOutEntityMetadata meta = (PacketPlayOutEntityMetadata) packet;
++            if(meta.a == player.getId()){
++                PacketPlayOutEntityMetadata copy = new PacketPlayOutEntityMetadata();
++                copy.a = meta.a;
++                copy.b = meta.b;
++                copy.obfuscate = false;
++                packet = copy;
++            }
+         }
+         // CraftBukkit end
+ 
+-- 
+1.9.4.msysgit.1
+
