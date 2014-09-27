@@ -1,0 +1,81 @@
+From f4ed1252d5c2bd91aa20693f4b8f43880e0ba047 Mon Sep 17 00:00:00 2001
+From: libhalt <libhalt@libhalt.net>
+Date: Sat, 27 Sep 2014 13:19:13 +0900
+Subject: [PATCH] FEAT: Significantly harder to ender pearl glitch
+
+
+diff --git a/src/main/java/net/minecraft/server/EntityProjectile.java b/src/main/java/net/minecraft/server/EntityProjectile.java
+index 650005f..d28d03b 100644
+--- a/src/main/java/net/minecraft/server/EntityProjectile.java
++++ b/src/main/java/net/minecraft/server/EntityProjectile.java
+@@ -109,7 +109,7 @@ public abstract class EntityProjectile extends Entity implements IProjectile {
+         }
+ 
+         Vec3D vec3d = Vec3D.a(this.locX, this.locY, this.locZ);
+-        Vec3D vec3d1 = Vec3D.a(this.locX + this.motX, this.locY + this.motY, this.locZ + this.motZ);
++        Vec3D vec3d1 = Vec3D.a(this.locX + (this.motX * 1.5) , this.locY + ((this.motY * 1.5) + 0.2), this.locZ + (this.motZ * 1.5));
+         MovingObjectPosition movingobjectposition = this.world.a(vec3d, vec3d1);
+ 
+         vec3d = Vec3D.a(this.locX, this.locY, this.locZ);
+diff --git a/src/main/java/net/minecraft/server/ItemEnderPearl.java b/src/main/java/net/minecraft/server/ItemEnderPearl.java
+new file mode 100644
+index 0000000..34e6e55
+--- /dev/null
++++ b/src/main/java/net/minecraft/server/ItemEnderPearl.java
+@@ -0,0 +1,53 @@
++package net.minecraft.server;
++
++public class ItemEnderPearl extends Item {
++
++    public ItemEnderPearl() {
++        this.maxStackSize = 16;
++        this.a(CreativeModeTab.f);
++    }
++
++    public ItemStack a(ItemStack itemstack, World world, EntityHuman entityhuman) {
++        if (entityhuman.abilities.canInstantlyBuild) {
++            return itemstack;
++        } else if(willLaunchInBlock(entityhuman)){
++            return itemstack;
++        } else {
++            --itemstack.count;
++            world.makeSound(entityhuman, "random.bow", 0.5F, 0.4F / (g.nextFloat() * 0.4F + 0.8F));
++            if (!world.isStatic) {
++                world.addEntity(new EntityEnderPearl(world, entityhuman));
++            }
++
++            return itemstack;
++        }
++    }
++
++    public boolean willLaunchInBlock(EntityHuman entityhuman){
++        double motX = (double) (-MathHelper.sin(entityhuman.yaw / 180.0F * 3.1415927F) * MathHelper.cos(entityhuman.pitch / 180.0F * 3.1415927F) * 0.4F);
++        double motZ = (double) (MathHelper.cos(entityhuman.yaw / 180.0F * 3.1415927F) * MathHelper.cos(entityhuman.pitch / 180.0F * 3.1415927F) * 0.4F);
++        double motY = (double) (-MathHelper.sin((entityhuman.pitch) / 180.0F * 3.1415927F) * 0.4F);
++
++        float f2 = MathHelper.sqrt(motX * motX + motY * motY + motZ * motZ);
++
++        motX /= (double) f2;
++        motY /= (double) f2;
++        motZ /= (double) f2;
++        motX += 0.5 * 0.007499999832361937D;
++        motY += 0.5 * 0.007499999832361937D;
++        motZ += 0.5 * 0.007499999832361937D;
++        motX *= 1.5;
++        motY *= 1.5;
++        motZ *= 1.5;
++
++        double locX = entityhuman.locX - (double) (MathHelper.cos(entityhuman.yaw / 180.0F * 3.1415927F) * 0.16F);
++        double locY = entityhuman.locY + entityhuman.getHeadHeight() - 0.10000000149011612D;
++        double locZ=  entityhuman.locZ - (double) (MathHelper.sin(entityhuman.yaw / 180.0F * 3.1415927F) * 0.16F);
++
++        Vec3D vec3d = Vec3D.a(locX ,locY, locZ);
++        Vec3D vec3d1 = Vec3D.a(locX + (motX * 1.5) ,locY + ((motY * 1.5) + 0.2), locZ + (motZ * 1.5));
++        MovingObjectPosition movingobjectposition = entityhuman.world.a(vec3d, vec3d1);
++
++        return movingobjectposition  != null && movingobjectposition.type == EnumMovingObjectType.BLOCK;
++    }
++}
+-- 
+1.9.4.msysgit.1
+

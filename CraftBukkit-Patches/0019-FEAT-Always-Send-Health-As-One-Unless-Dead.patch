@@ -3,12 +3,6 @@ From: libhalt <libhalt@libhalt.net>
 Date: Mon, 22 Sep 2014 15:04:29 +0900
 Subject: [PATCH] FEAT: Don't send health information unless dead
 
----
- src/main/java/net/minecraft/server/DataWatcher.java    | 18 +++++++++++-------
- .../minecraft/server/PacketPlayOutEntityMetadata.java  |  7 ++++---
- .../server/PacketPlayOutSpawnEntityLiving.java         |  2 +-
- .../java/net/minecraft/server/PlayerConnection.java    |  9 +++++++++
- 4 files changed, 25 insertions(+), 11 deletions(-)
 
 diff --git a/src/main/java/net/minecraft/server/DataWatcher.java b/src/main/java/net/minecraft/server/DataWatcher.java
 index f7e50fc..1b0c900 100644
