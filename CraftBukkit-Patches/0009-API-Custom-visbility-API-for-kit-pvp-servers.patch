@@ -1,4 +1,4 @@
-From 919fd6e5b27a9a2966d370aad792eab1fecac595 Mon Sep 17 00:00:00 2001
+From 9ed4acfe4574d1ef9c5a75fe427bf26e00a09a9c Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Fri, 4 Jul 2014 20:49:24 +1000
 Subject: [PATCH] API: Custom visbility API for kit pvp servers
@@ -309,7 +309,7 @@ index f4dec5b..4df314a 100644
      public Arrow spawnArrow(Location loc, Vector velocity, float speed, float spread) {
          Validate.notNull(loc, "Can not spawn arrow with a null location");
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 1f67ece..19c3fa4 100644
+index 1f67ece..e63de1b 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 @@ -7,13 +7,7 @@ import java.io.ByteArrayOutputStream;
@@ -352,13 +352,13 @@ index 1f67ece..19c3fa4 100644
 +        net.minecraft.server.Entity nmsEntity = ((CraftEntity) entity).getHandle();
 +        if (nmsEntity instanceof EntityProjectile) {
 +            EntityProjectile entityProjectile = (EntityProjectile) nmsEntity;
-+            if (entityProjectile.getShooter() instanceof EntityPlayer && ((EntityPlayer)entityProjectile.getShooter()).getBukkitEntity().kyoka().canSee(this)) {
++            if (entityProjectile.getShooter() instanceof EntityPlayer && !((EntityPlayer)entityProjectile.getShooter()).getBukkitEntity().kyoka().canSee(this)) {
 +                return false;
 +            }
 +        } else if (nmsEntity instanceof EntityArrow) {
 +            EntityArrow entityArrow = (EntityArrow) nmsEntity;
 +
-+            if (entityArrow.shooter instanceof EntityPlayer && ((EntityPlayer)entityArrow.shooter).getBukkitEntity().kyoka().canSee(this)) {
++            if (entityArrow.shooter instanceof EntityPlayer && !((EntityPlayer)entityArrow.shooter).getBukkitEntity().kyoka().canSee(this)) {
 +                return false;
 +            }
 +
