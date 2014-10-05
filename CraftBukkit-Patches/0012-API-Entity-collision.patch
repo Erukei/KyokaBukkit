@@ -1,14 +1,14 @@
-From f85631f1d070f1f0785306f7c9fbf5deb862887e Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Fri, 4 Jul 2014 18:00:39 +1000
+From fa0316632167fefbbd90a99f1370b2929c094568 Mon Sep 17 00:00:00 2001
 Subject: [PATCH] API: Entity collision
 
 
 diff --git a/src/main/java/net/minecraft/server/EntityHuman.java b/src/main/java/net/minecraft/server/EntityHuman.java
-index f4eb223..3bf5034 100644
+index 1d6886c..d68994d 100644
 --- a/src/main/java/net/minecraft/server/EntityHuman.java
 +++ b/src/main/java/net/minecraft/server/EntityHuman.java
-@@ -430,7 +430,7 @@ public abstract class EntityHuman extends EntityLiving implements ICommandListen
+@@ -432,7 +432,7 @@ public abstract class EntityHuman extends EntityLiving implements ICommandListen
  
              List list = this.world.getEntities(this, axisalignedbb);
  
@@ -31,10 +31,10 @@ index a44ad51..762c6d9 100644
                  Entity entity = (Entity) list.get(i);
  
 diff --git a/src/main/java/net/minecraft/server/EntityPlayer.java b/src/main/java/net/minecraft/server/EntityPlayer.java
-index 0a7205a..e8017a8 100644
+index 26ae01a..e91e5a2 100644
 --- a/src/main/java/net/minecraft/server/EntityPlayer.java
 +++ b/src/main/java/net/minecraft/server/EntityPlayer.java
-@@ -63,6 +63,19 @@ public class EntityPlayer extends EntityHuman implements ICrafting {
+@@ -64,6 +64,19 @@ public class EntityPlayer extends EntityHuman implements ICrafting {
      public double maxHealthCache;
      public boolean joining = true;
      // CraftBukkit end
@@ -55,12 +55,12 @@ index 0a7205a..e8017a8 100644
      public EntityPlayer(MinecraftServer minecraftserver, WorldServer worldserver, GameProfile gameprofile, PlayerInteractManager playerinteractmanager) {
          super(worldserver, gameprofile);
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 91d54eb..2d21681 100644
+index b22ca1b..07c666c 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -1355,6 +1355,17 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -1363,6 +1363,17 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          public boolean canSee(Player player) {
-             return !kyokaHiddenPlayers.containsKey(player.getUniqueId());
+             return !kyokaHiddenPlayers.contains(player);
          }
 +
 +        @Override

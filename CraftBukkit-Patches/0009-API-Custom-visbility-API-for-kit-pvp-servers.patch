@@ -1,4 +1,4 @@
-From 357a24cddf3abc9d1a779bb653a445dfd95c1fca Mon Sep 17 00:00:00 2001
+From 919fd6e5b27a9a2966d370aad792eab1fecac595 Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Fri, 4 Jul 2014 20:49:24 +1000
 Subject: [PATCH] API: Custom visbility API for kit pvp servers
@@ -110,10 +110,10 @@ index 69db29f..180abd2 100644
          }
      }
 diff --git a/src/main/java/net/minecraft/server/EntityProjectile.java b/src/main/java/net/minecraft/server/EntityProjectile.java
-index 7f8a33b..affe4dd 100644
+index 7f8a33b..650005f 100644
 --- a/src/main/java/net/minecraft/server/EntityProjectile.java
 +++ b/src/main/java/net/minecraft/server/EntityProjectile.java
-@@ -120,10 +120,16 @@ public abstract class EntityProjectile extends Entity implements IProjectile {
+@@ -120,7 +120,7 @@ public abstract class EntityProjectile extends Entity implements IProjectile {
  
          if (!this.world.isStatic) {
              Entity entity = null;
