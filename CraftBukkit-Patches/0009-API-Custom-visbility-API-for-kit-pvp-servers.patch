@@ -1,11 +1,11 @@
-From 8f42d1e1ec228f045efea5d1b4b30ae9a63701ee Mon Sep 17 00:00:00 2001
+From 357a24cddf3abc9d1a779bb653a445dfd95c1fca Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Fri, 4 Jul 2014 20:49:24 +1000
 Subject: [PATCH] API: Custom visbility API for kit pvp servers
 
 
 diff --git a/src/main/java/net/minecraft/server/Entity.java b/src/main/java/net/minecraft/server/Entity.java
-index 09c9c8e..29eebe2 100644
+index 09c9c8e..a023647 100644
 --- a/src/main/java/net/minecraft/server/Entity.java
 +++ b/src/main/java/net/minecraft/server/Entity.java
 @@ -1889,4 +1889,16 @@ public abstract class Entity {
@@ -20,7 +20,7 @@ index 09c9c8e..29eebe2 100644
 +            if (!(entity instanceof EntityPlayer)) {
 +                return true;
 +            }
-+            return ((EntityPlayer) entity).getBukkitEntity().canSee(getBukkitEntity());
++            return ((EntityPlayer) entity).getBukkitEntity().canSeeEntity(getBukkitEntity());
 +        }
 +    };
 +    // Kyoka end
@@ -39,31 +39,22 @@ index 88b0751..c0cdd61 100644
  
              int j;
 diff --git a/src/main/java/net/minecraft/server/EntityHuman.java b/src/main/java/net/minecraft/server/EntityHuman.java
-index 331dbac..b4fe89b 100644
+index 331dbac..738ed07 100644
 --- a/src/main/java/net/minecraft/server/EntityHuman.java
 +++ b/src/main/java/net/minecraft/server/EntityHuman.java
-@@ -529,7 +529,7 @@ public abstract class EntityHuman extends EntityLiving implements ICommandListen
-             return null;
+@@ -530,6 +530,7 @@ public abstract class EntityHuman extends EntityLiving implements ICommandListen
          } else {
              EntityItem entityitem = new EntityItem(this.world, this.locX, this.locY - 0.30000001192092896D + (double) this.getHeadHeight(), this.locZ, itemstack);
--
+ 
 +            entityitem.owner = this; // Kyoka
              entityitem.pickupDelay = 40;
              if (flag1) {
                  entityitem.b(this.getName());
 diff --git a/src/main/java/net/minecraft/server/EntityItem.java b/src/main/java/net/minecraft/server/EntityItem.java
-index 394bfbf..6e97ca4 100644
+index 394bfbf..834def0 100644
 --- a/src/main/java/net/minecraft/server/EntityItem.java
 +++ b/src/main/java/net/minecraft/server/EntityItem.java
-@@ -5,6 +5,7 @@ import java.util.Iterator;
- import org.apache.logging.log4j.LogManager;
- import org.apache.logging.log4j.Logger;
- 
-+import org.bukkit.craftbukkit.entity.CraftPlayer;
- import org.bukkit.event.player.PlayerPickupItemEvent; // CraftBukkit
- 
- public class EntityItem extends Entity {
-@@ -17,6 +18,7 @@ public class EntityItem extends Entity {
+@@ -17,6 +17,7 @@ public class EntityItem extends Entity {
      private String g;
      public float c;
      private int lastTick = MinecraftServer.currentTick; // CraftBukkit
@@ -71,16 +62,15 @@ index 394bfbf..6e97ca4 100644
  
      public EntityItem(World world, double d0, double d1, double d2) {
          super(world);
-@@ -236,6 +238,12 @@ public class EntityItem extends Entity {
+@@ -236,6 +237,11 @@ public class EntityItem extends Entity {
  
      public void b_(EntityHuman entityhuman) {
          if (!this.world.isStatic) {
 +            // Kyoka start
-+            if(!((EntityPlayer) entityhuman).getBukkitEntity().canSee(this.getBukkitEntity())) {
++            if(!((EntityPlayer) entityhuman).getBukkitEntity().canSeeEntity(this.getBukkitEntity())) {
 +                return;
 +            }
 +            // Kyoka end
-+
              ItemStack itemstack = this.getItemStack();
              int i = itemstack.count;
  
@@ -97,16 +87,6 @@ index 0c63b2c..a44ad51 100644
                  }
                  // CraftBukkit end
              }
-diff --git a/src/main/java/net/minecraft/server/EntityPlayer.java b/src/main/java/net/minecraft/server/EntityPlayer.java
-index 6b2b60c..0a7205a 100644
---- a/src/main/java/net/minecraft/server/EntityPlayer.java
-+++ b/src/main/java/net/minecraft/server/EntityPlayer.java
-@@ -1109,4 +1109,5 @@ public class EntityPlayer extends EntityHuman implements ICrafting {
-         return (CraftPlayer) super.getBukkitEntity();
-     }
-     // CraftBukkit end
-+
- }
 diff --git a/src/main/java/net/minecraft/server/EntityPotion.java b/src/main/java/net/minecraft/server/EntityPotion.java
 index 69db29f..180abd2 100644
 --- a/src/main/java/net/minecraft/server/EntityPotion.java
@@ -130,10 +110,10 @@ index 69db29f..180abd2 100644
          }
      }
 diff --git a/src/main/java/net/minecraft/server/EntityProjectile.java b/src/main/java/net/minecraft/server/EntityProjectile.java
-index 7f8a33b..650005f 100644
+index 7f8a33b..affe4dd 100644
 --- a/src/main/java/net/minecraft/server/EntityProjectile.java
 +++ b/src/main/java/net/minecraft/server/EntityProjectile.java
-@@ -120,7 +120,7 @@ public abstract class EntityProjectile extends Entity implements IProjectile {
+@@ -120,10 +120,16 @@ public abstract class EntityProjectile extends Entity implements IProjectile {
  
          if (!this.world.isStatic) {
              Entity entity = null;
@@ -156,7 +136,7 @@ index 68625a4..7874fab 100644
              // CraftBukkit end
  
 diff --git a/src/main/java/net/minecraft/server/EntityTrackerEntry.java b/src/main/java/net/minecraft/server/EntityTrackerEntry.java
-index 0cf9ad5..5485e6e 100644
+index 0cf9ad5..e1443b7 100644
 --- a/src/main/java/net/minecraft/server/EntityTrackerEntry.java
 +++ b/src/main/java/net/minecraft/server/EntityTrackerEntry.java
 @@ -305,13 +305,12 @@ public class EntityTrackerEntry {
@@ -170,7 +150,7 @@ index 0cf9ad5..5485e6e 100644
 -                            return;
 -                        }
 +                    // Kyoka start
-+                    if (!entityplayer.getBukkitEntity().canSee(this.tracker.getBukkitEntity())) {
++                    if (!entityplayer.getBukkitEntity().canSeeEntity(this.tracker.getBukkitEntity())) {
 +                        return;
                      }
 +                    // Kyoka end
@@ -179,7 +159,7 @@ index 0cf9ad5..5485e6e 100644
                      entityplayer.removeQueue.remove(Integer.valueOf(this.tracker.getId()));
                      // CraftBukkit end
 diff --git a/src/main/java/net/minecraft/server/PlayerList.java b/src/main/java/net/minecraft/server/PlayerList.java
-index e6012fb..7c4a73c 100644
+index e6012fb..84c3027 100644
 --- a/src/main/java/net/minecraft/server/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/PlayerList.java
 @@ -1026,7 +1026,7 @@ public abstract class PlayerList {
@@ -187,7 +167,7 @@ index e6012fb..7c4a73c 100644
  
              // CraftBukkit start - Test if player receiving packet can see the source of the packet
 -            if (entityhuman != null && entityhuman instanceof EntityPlayer && !entityplayer.getBukkitEntity().canSee(((EntityPlayer) entityhuman).getBukkitEntity())) {
-+            if (entityhuman != null && !entityplayer.getBukkitEntity().canSee(entityhuman.getBukkitEntity())) { // Kyoka
++            if (entityhuman != null && !entityplayer.getBukkitEntity().canSeeEntity(entityhuman.getBukkitEntity())) { // Kyoka
                  continue;
              }
              // CraftBukkit end
@@ -200,7 +180,7 @@ index e6012fb..7c4a73c 100644
 +        for (int j = 0; j < this.players.size(); ++j) {
 +            EntityPlayer entityplayer = (EntityPlayer) this.players.get(j);
 +
-+            if (entity != null && !entityplayer.getBukkitEntity().canSee(entity.getBukkitEntity())) {
++            if (entity != null && !entityplayer.getBukkitEntity().canSeeEntity(entity.getBukkitEntity())) {
 +                continue;
 +            }
 +
@@ -329,16 +309,10 @@ index f4dec5b..4df314a 100644
      public Arrow spawnArrow(Location loc, Vector velocity, float speed, float spread) {
          Validate.notNull(loc, "Can not spawn arrow with a null location");
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 1f67ece..e6730b9 100644
+index 1f67ece..19c3fa4 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -1,19 +1,12 @@
- package org.bukkit.craftbukkit.entity;
- 
- import com.google.common.collect.ImmutableSet;
--import com.google.common.collect.MapMaker;
- 
- import java.io.ByteArrayOutputStream;
+@@ -7,13 +7,7 @@ import java.io.ByteArrayOutputStream;
  import java.io.IOException;
  import java.net.InetSocketAddress;
  import java.net.SocketAddress;
@@ -353,7 +327,7 @@ index 1f67ece..e6730b9 100644
  import java.util.logging.Level;
  import java.util.logging.Logger;
  
-@@ -46,6 +39,7 @@ import org.bukkit.craftbukkit.map.RenderData;
+@@ -46,6 +40,7 @@ import org.bukkit.craftbukkit.map.RenderData;
  import org.bukkit.craftbukkit.scoreboard.CraftScoreboard;
  import org.bukkit.craftbukkit.util.CraftChatMessage;
  import org.bukkit.craftbukkit.util.CraftMagicNumbers;
@@ -361,49 +335,47 @@ index 1f67ece..e6730b9 100644
  import org.bukkit.entity.EntityType;
  import org.bukkit.entity.Player;
  import org.bukkit.event.player.PlayerGameModeChangeEvent;
-@@ -67,6 +61,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -67,6 +62,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
      private final ConversationTracker conversationTracker = new ConversationTracker();
      private final Set<String> channels = new HashSet<String>();
      private final Set<UUID> hiddenPlayers = new HashSet<UUID>();
-+    private final WeakHashMap<UUID, Player> kyokaHiddenPlayers = new WeakHashMap<>(); // Kyoka
++    private final Set<Player> kyokaHiddenPlayers = Collections.newSetFromMap(new WeakHashMap<Player , Boolean>());
      private int hash = 0;
      private double health = 20;
      private boolean scaledHealth = false;
-@@ -921,6 +916,33 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -921,6 +917,31 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          return !hiddenPlayers.contains(player.getUniqueId());
      }
  
 +    // Kyoka start
-+    public boolean canSee(Entity entity) {
++    public boolean canSeeEntity(Entity entity) {
 +        net.minecraft.server.Entity nmsEntity = ((CraftEntity) entity).getHandle();
 +        if (nmsEntity instanceof EntityProjectile) {
 +            EntityProjectile entityProjectile = (EntityProjectile) nmsEntity;
-+
-+            if (entityProjectile.shooter instanceof EntityPlayer && kyokaHiddenPlayers.containsKey(entityProjectile.shooter.getUniqueID())) {
++            if (entityProjectile.getShooter() instanceof EntityPlayer && ((EntityPlayer)entityProjectile.getShooter()).getBukkitEntity().kyoka().canSee(this)) {
 +                return false;
 +            }
-+
 +        } else if (nmsEntity instanceof EntityArrow) {
 +            EntityArrow entityArrow = (EntityArrow) nmsEntity;
 +
-+            if (entityArrow.shooter instanceof EntityPlayer && kyokaHiddenPlayers.containsKey(entityArrow.shooter.getUniqueID())) {
++            if (entityArrow.shooter instanceof EntityPlayer && ((EntityPlayer)entityArrow.shooter).getBukkitEntity().kyoka().canSee(this)) {
 +                return false;
 +            }
 +
 +        } else if (nmsEntity instanceof EntityItem) {
 +            EntityItem entityItem = (EntityItem) nmsEntity;
-+            if (entityItem.owner instanceof EntityPlayer && kyokaHiddenPlayers.containsKey(entityItem.owner.getUniqueID())) {
++            if (entityItem.owner instanceof EntityPlayer && kyokaHiddenPlayers.contains(entityItem.owner.getBukkitEntity())) {
 +                return false;
 +            }
 +        }
-+        return !hiddenPlayers.contains(entity.getUniqueId()) && !kyokaHiddenPlayers.containsKey(entity.getUniqueId());
++        return !hiddenPlayers.contains(entity.getUniqueId()) && !kyokaHiddenPlayers.contains(entity);
 +    }
 +    // Kyoka end
 +
      public Map<String, Object> serialize() {
          Map<String, Object> result = new LinkedHashMap<String, Object>();
  
-@@ -1295,6 +1317,43 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -1295,6 +1316,43 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          public String getLocale() {
              return getHandle().locale;
          }
@@ -414,7 +386,7 @@ index 1f67ece..e6730b9 100644
 +            if (getHandle().playerConnection == null) return;
 +            if (CraftPlayer.this.equals(player)) return;
 +            if (!canSee(player)) return;
-+            kyokaHiddenPlayers.put(player.getUniqueId(), player);
++            kyokaHiddenPlayers.add(player);
 +
 +            EntityTracker tracker = ((WorldServer) entity.world).tracker;
 +            EntityPlayer other = ((CraftPlayer) player).getHandle();
@@ -430,7 +402,7 @@ index 1f67ece..e6730b9 100644
 +            if (getHandle().playerConnection == null) return;
 +            if (CraftPlayer.this.equals(player)) return;
 +            if (canSee(player)) return;
-+            kyokaHiddenPlayers.remove(player.getUniqueId());
++            kyokaHiddenPlayers.remove(player);
 +
 +            EntityTracker tracker = ((WorldServer) entity.world).tracker;
 +            EntityPlayer other = ((CraftPlayer) player).getHandle();
@@ -442,7 +414,7 @@ index 1f67ece..e6730b9 100644
 +
 +        @Override
 +        public boolean canSee(Player player) {
-+            return !kyokaHiddenPlayers.containsKey(player.getUniqueId());
++            return !kyokaHiddenPlayers.contains(player);
 +        }
      };
  
@@ -461,5 +433,5 @@ index 9b10c41..cd78e15 100644
  
          return event;
 -- 
-1.9.1
+1.9.4.msysgit.2
 
