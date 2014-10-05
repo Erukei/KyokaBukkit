@@ -1,25 +1,30 @@
-From f4ed1252d5c2bd91aa20693f4b8f43880e0ba047 Mon Sep 17 00:00:00 2001
+From 48ed6ef77c011223c5a337b937be4731981f1038 Mon Sep 17 00:00:00 2001
 From: libhalt <libhalt@libhalt.net>
 Date: Sat, 27 Sep 2014 13:19:13 +0900
 Subject: [PATCH] FEAT: Significantly harder to ender pearl glitch
 
 
 diff --git a/src/main/java/net/minecraft/server/EntityProjectile.java b/src/main/java/net/minecraft/server/EntityProjectile.java
-index 650005f..d28d03b 100644
+index 650005f..8b0ecce 100644
 --- a/src/main/java/net/minecraft/server/EntityProjectile.java
 +++ b/src/main/java/net/minecraft/server/EntityProjectile.java
-@@ -109,7 +109,7 @@ public abstract class EntityProjectile extends Entity implements IProjectile {
+@@ -109,11 +109,11 @@ public abstract class EntityProjectile extends Entity implements IProjectile {
          }
  
          Vec3D vec3d = Vec3D.a(this.locX, this.locY, this.locZ);
 -        Vec3D vec3d1 = Vec3D.a(this.locX + this.motX, this.locY + this.motY, this.locZ + this.motZ);
-+        Vec3D vec3d1 = Vec3D.a(this.locX + (this.motX * 1.5) , this.locY + ((this.motY * 1.5) + 0.2), this.locZ + (this.motZ * 1.5));
++        Vec3D vec3d1 = Vec3D.a(this.locX + (this.motX * 1.5) + (this.motX < 0 ? - 0.25 : 0.25) , this.locY + ((this.motY * 1.5) + 0.2) + (this.motY < 0 ? - 0.25 : 0.25), this.locZ + (this.motZ * 1.5) + (this.motZ < 0 ? - 0.25 : 0.25));
          MovingObjectPosition movingobjectposition = this.world.a(vec3d, vec3d1);
  
          vec3d = Vec3D.a(this.locX, this.locY, this.locZ);
+-        vec3d1 = Vec3D.a(this.locX + this.motX, this.locY + this.motY, this.locZ + this.motZ);
++        vec3d1 = Vec3D.a(this.locX + (this.motX * 1.5) + (this.motX < 0 ? - 0.25 : 0.25) , this.locY + ((this.motY * 1.5) + 0.2) + (this.motY < 0 ? - 0.25 : 0.25), this.locZ + (this.motZ * 1.5) + (this.motZ < 0 ? - 0.25 : 0.25));
+         if (movingobjectposition != null) {
+             vec3d1 = Vec3D.a(movingobjectposition.pos.a, movingobjectposition.pos.b, movingobjectposition.pos.c);
+         }
 diff --git a/src/main/java/net/minecraft/server/ItemEnderPearl.java b/src/main/java/net/minecraft/server/ItemEnderPearl.java
 new file mode 100644
-index 0000000..34e6e55
+index 0000000..ce1289e
 --- /dev/null
 +++ b/src/main/java/net/minecraft/server/ItemEnderPearl.java
 @@ -0,0 +1,53 @@
@@ -70,12 +75,12 @@ index 0000000..34e6e55
 +        double locZ=  entityhuman.locZ - (double) (MathHelper.sin(entityhuman.yaw / 180.0F * 3.1415927F) * 0.16F);
 +
 +        Vec3D vec3d = Vec3D.a(locX ,locY, locZ);
-+        Vec3D vec3d1 = Vec3D.a(locX + (motX * 1.5) ,locY + ((motY * 1.5) + 0.2), locZ + (motZ * 1.5));
++        Vec3D vec3d1 = Vec3D.a(locX + (motX * 1.5) + (motX < 0 ? - 0.25 : 0.25) ,locY + ((motY * 1.5) + 0.2) + (motY < 0 ? - 0.25 : 0.25), locZ + (motZ * 1.5) + (motZ < 0 ? - 0.25 : 0.25));
 +        MovingObjectPosition movingobjectposition = entityhuman.world.a(vec3d, vec3d1);
 +
 +        return movingobjectposition  != null && movingobjectposition.type == EnumMovingObjectType.BLOCK;
 +    }
 +}
 -- 
-1.9.4.msysgit.1
+1.9.4.msysgit.2
 
