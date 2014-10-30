@@ -1,4 +1,4 @@
-From cc99577eeddfae271f7520cec5e1fd72b85394bd Mon Sep 17 00:00:00 2001
+From 5cc56e6588dc2776de438c7e8e5c7d1b4ad9ef0f Mon Sep 17 00:00:00 2001
 From: libhalt <libhalt@libhalt.net>
 Date: Thu, 28 Aug 2014 16:17:25 +0900
 Subject: [PATCH] API: BossBar-API
@@ -34,10 +34,10 @@ index 5829535..9a70017 100644
  
      public PacketPlayOutSpawnEntityLiving() {}
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index a8b6ff5..171e119 100644
+index 31991a3..4a898da 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -1381,6 +1381,43 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -1380,6 +1380,43 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          public void setRevertedHunger(boolean useOldHunger) {
              craftPlayer.getHandle().revertedHunger = useOldHunger;
          }
@@ -82,5 +82,5 @@ index a8b6ff5..171e119 100644
  
      public Kyoka kyoka() {
 -- 
-1.9.4.msysgit.1
+1.9.1
 

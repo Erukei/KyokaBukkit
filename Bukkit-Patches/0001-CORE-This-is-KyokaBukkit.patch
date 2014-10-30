@@ -1,11 +1,11 @@
-From a0c4c9ee471fbb566445300820c1819263ffa60b Mon Sep 17 00:00:00 2001
+From 4923868931d6728fa3e0a00308635448288b5b26 Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Sun, 29 Jun 2014 16:59:56 +1000
 Subject: [PATCH] CORE: This is KyokaBukkit
 
 
 diff --git a/pom.xml b/pom.xml
-index 4c5937a..2c4608e 100644
+index 4c5937a..32e4631 100644
 --- a/pom.xml
 +++ b/pom.xml
 @@ -1,42 +1,21 @@
@@ -13,13 +13,13 @@ index 4c5937a..2c4608e 100644
      <modelVersion>4.0.0</modelVersion>
 -    <groupId>org.bukkit</groupId>
 -    <artifactId>bukkit</artifactId>
-+    <groupId>com.erukei</groupId>
++    <groupId>nl.hiraku</groupId>
 +    <artifactId>kyoka-api</artifactId>
      <version>1.7.10-R0.1-SNAPSHOT</version>
 -    <name>Bukkit</name>
 -    <url>http://www.bukkit.org</url>
 +    <name>Kyoka-API</name>
-+    <url>https://github.com/Erukei/KyokaBukkit</url>
++    <url>https://github.com/HirakuNetwork/KyokaBukkit</url>
  
      <properties>
          <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -53,7 +53,7 @@ index 4c5937a..2c4608e 100644
 -        </snapshotRepository>
 -    </distributionManagement>
 +    <parent>
-+        <groupId>com.erukei</groupId>
++        <groupId>nl.hiraku</groupId>
 +        <artifactId>kyoka-parent</artifactId>
 +        <version>1.0-SNAPSHOT</version>
 +        <relativePath>../pom.xml</relativePath>

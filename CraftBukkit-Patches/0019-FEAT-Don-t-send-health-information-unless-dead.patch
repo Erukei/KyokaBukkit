@@ -1,4 +1,4 @@
-From 5d59dbc210815b8d35a57ba2dc0b19ff81f857ec Mon Sep 17 00:00:00 2001
+From ff692b2ae526b362fb9cc585b93abac3707ac8c7 Mon Sep 17 00:00:00 2001
 From: libhalt <libhalt@libhalt.net>
 Date: Mon, 22 Sep 2014 15:04:29 +0900
 Subject: [PATCH] FEAT: Don't send health information unless dead
@@ -131,5 +131,5 @@ index d7d3916..48b7b0d 100644
          // CraftBukkit end
  
 -- 
-1.9.4.msysgit.1
+1.9.1
 

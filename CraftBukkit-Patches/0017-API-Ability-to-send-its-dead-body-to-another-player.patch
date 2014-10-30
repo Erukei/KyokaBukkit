@@ -1,10 +1,11 @@
-From 30a813a5acdf1f2dacb2bd093476f9cc00c96243 Mon Sep 17 00:00:00 2001
+From 73fb821950ead69bc21cb4370ad6b6078c8d03b1 Mon Sep 17 00:00:00 2001
 From: libhalt <libhalt@libhalt.net>
 Date: Sat, 30 Aug 2014 14:38:24 +0900
 Subject: [PATCH] API: Ability to send its dead body to another player
 
+
 diff --git a/src/main/java/net/minecraft/server/PacketPlayOutNamedEntitySpawn.java b/src/main/java/net/minecraft/server/PacketPlayOutNamedEntitySpawn.java
-index ccd4cec..1dc6a42 100644
+index ecc28be..0e57496 100644
 --- a/src/main/java/net/minecraft/server/PacketPlayOutNamedEntitySpawn.java
 +++ b/src/main/java/net/minecraft/server/PacketPlayOutNamedEntitySpawn.java
 @@ -11,7 +11,7 @@ import java.io.IOException; // CraftBukkit
@@ -17,10 +18,10 @@ index ccd4cec..1dc6a42 100644
      private int c;
      private int d;
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index ffa88f4..85116f3 100644
+index 4a898da..1fe1b99 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -51,6 +51,7 @@ import org.bukkit.map.MapView;
+@@ -52,6 +52,7 @@ import org.bukkit.map.MapView;
  import org.bukkit.metadata.MetadataValue;
  import org.bukkit.plugin.Plugin;
  import org.bukkit.plugin.messaging.StandardMessenger;
@@ -28,7 +29,7 @@ index ffa88f4..85116f3 100644
  import org.bukkit.scoreboard.Scoreboard;
  import org.bukkit.util.Vector;
  
-@@ -1314,6 +1315,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -1322,6 +1323,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
      // Kyoka start
      private final CraftPlayer craftPlayer = this;
@@ -38,7 +39,7 @@ index ffa88f4..85116f3 100644
      private final Kyoka kyoka = new Kyoka() {
          @Override
          public String getLocale() {
-@@ -1398,6 +1402,26 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -1406,6 +1410,26 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
              getHandle().playerConnection.sendPacket(packetEntityMeta);
          }
  
@@ -65,7 +66,7 @@ index ffa88f4..85116f3 100644
          private DataWatcher getEnderDragonDataWatcher(String text, float value){
              //Why? using wrapper class CLARIFY which object we are using and wont use wrong object due to ambiguous Object Parameter
              DataWatcher watcher = new DataWatcher(null);
-@@ -1411,6 +1435,20 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -1419,6 +1443,20 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          }
      };
  
@@ -87,5 +88,5 @@ index ffa88f4..85116f3 100644
          return kyoka;
      }
 -- 
-1.9.4.msysgit.1
+1.9.1
 

@@ -1,43 +1,17 @@
-From a6e942b373fec2141e7c19dcb5bd400641e11a14 Mon Sep 17 00:00:00 2001
+From 15ac67db8f5159f845e94d691076f4d274b61a4f Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Tue, 1 Jul 2014 16:42:39 +1000
 Subject: [PATCH] FEAT: BungeeCord support
 
 
-diff --git a/src/main/java/com/erukei/kyoka/KyokaConfig.java b/src/main/java/com/erukei/kyoka/KyokaConfig.java
-index ed33681..c464d7e 100644
---- a/src/main/java/com/erukei/kyoka/KyokaConfig.java
-+++ b/src/main/java/com/erukei/kyoka/KyokaConfig.java
-@@ -14,8 +14,11 @@ public class KyokaConfig {
-     private static File configFile = new File("kyoka.yml");
-     private static YamlConfiguration config;
- 
-+    public static boolean bungeecord;
-+
-     public static void init() {
-         config = YamlConfiguration.loadConfiguration(configFile);
-+        config.options().copyDefaults(true);
-         for (Method method : KyokaConfig.class.getDeclaredMethods()) {
-             if (Modifier.isPrivate(method.getModifiers()) && method.getParameterTypes().length == 0 && method.getReturnType().equals(Void.TYPE)) {
-                 method.setAccessible(true);
-@@ -34,4 +37,9 @@ public class KyokaConfig {
-         }
- 
-     }
-+
-+    private static void bungeecord() {
-+        config.addDefault("bungeecord", false);
-+        bungeecord = config.getBoolean("bungeecord");
-+    }
- }
 diff --git a/src/main/java/net/minecraft/server/HandshakeListener.java b/src/main/java/net/minecraft/server/HandshakeListener.java
-index 52bc69b..9ce3ab5 100644
+index 52bc69b..c4dc7d1 100644
 --- a/src/main/java/net/minecraft/server/HandshakeListener.java
 +++ b/src/main/java/net/minecraft/server/HandshakeListener.java
 @@ -1,5 +1,9 @@
  package net.minecraft.server;
  
-+import com.erukei.kyoka.KyokaConfig;
++import nl.hiraku.kyoka.KyokaConfig;
 +import com.google.gson.Gson;
 +import net.minecraft.util.com.mojang.authlib.properties.Property;
 +import net.minecraft.util.com.mojang.util.UUIDTypeAdapter;
@@ -292,8 +266,34 @@ index 6b91be7..e967362 100644
 +        LoginListener.a(this.a, EnumProtocolState.READY_TO_ACCEPT);
 +    }
  }
+diff --git a/src/main/java/nl/hiraku/kyoka/KyokaConfig.java b/src/main/java/nl/hiraku/kyoka/KyokaConfig.java
+index f5a48c7..3ebbc7c 100644
+--- a/src/main/java/nl/hiraku/kyoka/KyokaConfig.java
++++ b/src/main/java/nl/hiraku/kyoka/KyokaConfig.java
+@@ -14,8 +14,11 @@ public class KyokaConfig {
+     private static File configFile = new File("kyoka.yml");
+     private static YamlConfiguration config;
+ 
++    public static boolean bungeecord;
++
+     public static void init() {
+         config = YamlConfiguration.loadConfiguration(configFile);
++        config.options().copyDefaults(true);
+         for (Method method : KyokaConfig.class.getDeclaredMethods()) {
+             if (Modifier.isPrivate(method.getModifiers()) && method.getParameterTypes().length == 0 && method.getReturnType().equals(Void.TYPE)) {
+                 method.setAccessible(true);
+@@ -34,4 +37,9 @@ public class KyokaConfig {
+         }
+ 
+     }
++
++    private static void bungeecord() {
++        config.addDefault("bungeecord", false);
++        bungeecord = config.getBoolean("bungeecord");
++    }
+ }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 29b3648..89dc6ef 100644
+index 03870c1..5b11af7 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -678,7 +678,13 @@ public final class CraftServer implements Server {

@@ -1,11 +1,11 @@
-From c6d83e28710f887d51b1dee5b8f7808942d4cef7 Mon Sep 17 00:00:00 2001
+From c6e61a31c99f47d359f1cef3951492d1c150e1ac Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Sun, 29 Jun 2014 17:01:50 +1000
 Subject: [PATCH] CORE: This is KyokaBukkit
 
 
 diff --git a/pom.xml b/pom.xml
-index 8dc82eb..0600f19 100644
+index 8dc82eb..6d93397 100644
 --- a/pom.xml
 +++ b/pom.xml
 @@ -1,12 +1,12 @@
@@ -14,14 +14,14 @@ index 8dc82eb..0600f19 100644
    <modelVersion>4.0.0</modelVersion>
 -  <groupId>org.bukkit</groupId>
 -  <artifactId>craftbukkit</artifactId>
-+  <groupId>com.erukei</groupId>
++  <groupId>nl.hiraku</groupId>
 +  <artifactId>kyoka-server</artifactId>
    <packaging>jar</packaging>
    <version>1.7.10-R0.1-SNAPSHOT</version>
 -  <name>CraftBukkit</name>
 -  <url>http://www.bukkit.org</url>
 +  <name>Kyoka-Server</name>
-+  <url>https://github.com/Erukei/KyokaBukkit</url>
++  <url>https://github.com/HirakuNetwork/KyokaBukkit</url>
  
    <properties>
      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -62,7 +62,7 @@ index 8dc82eb..0600f19 100644
      <dependency>
 -      <groupId>org.bukkit</groupId>
 -      <artifactId>bukkit</artifactId>
-+      <groupId>com.erukei</groupId>
++      <groupId>nl.hiraku</groupId>
 +      <artifactId>kyoka-api</artifactId>
        <version>${project.version}</version>
        <type>jar</type>
