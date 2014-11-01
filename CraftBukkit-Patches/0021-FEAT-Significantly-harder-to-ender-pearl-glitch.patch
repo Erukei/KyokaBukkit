@@ -1,4 +1,4 @@
-From 8885e9070b505201239573fd89eb195142869d77 Mon Sep 17 00:00:00 2001
+From 990e7e9bafcf10ba6315aae738c75ffa1a6e19e5 Mon Sep 17 00:00:00 2001
 From: libhalt <libhalt@libhalt.net>
 Date: Sat, 27 Sep 2014 13:19:13 +0900
 Subject: [PATCH] FEAT: Significantly harder to ender pearl glitch
@@ -22,38 +22,36 @@ index 650005f..8b0ecce 100644
          if (movingobjectposition != null) {
              vec3d1 = Vec3D.a(movingobjectposition.pos.a, movingobjectposition.pos.b, movingobjectposition.pos.c);
          }
-diff --git a/src/main/java/net/minecraft/server/ItemEnderPearl.java b/src/main/java/net/minecraft/server/ItemEnderPearl.java
-new file mode 100644
-index 0000000..ce1289e
---- /dev/null
-+++ b/src/main/java/net/minecraft/server/ItemEnderPearl.java
-@@ -0,0 +1,53 @@
-+package net.minecraft.server;
-+
-+public class ItemEnderPearl extends Item {
-+
-+    public ItemEnderPearl() {
-+        this.maxStackSize = 16;
-+        this.a(CreativeModeTab.f);
-+    }
-+
-+    public ItemStack a(ItemStack itemstack, World world, EntityHuman entityhuman) {
-+        if (entityhuman.abilities.canInstantlyBuild) {
-+            return itemstack;
-+        } else if(willLaunchInBlock(entityhuman)){
-+            return itemstack;
-+        } else {
-+            --itemstack.count;
-+            world.makeSound(entityhuman, "random.bow", 0.5F, 0.4F / (g.nextFloat() * 0.4F + 0.8F));
-+            if (!world.isStatic) {
-+                world.addEntity(new EntityEnderPearl(world, entityhuman));
+diff --git a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
+index cd78e15..23b95b7 100644
+--- a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
++++ b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
+@@ -28,6 +28,7 @@ import net.minecraft.server.Explosion;
+ import net.minecraft.server.InventoryCrafting;
+ import net.minecraft.server.ItemStack;
+ import net.minecraft.server.Items;
++import net.minecraft.server.Item;
+ import net.minecraft.server.PacketPlayInCloseWindow;
+ import net.minecraft.server.PacketPlayOutSetSlot;
+ import net.minecraft.server.Slot;
+@@ -222,6 +223,11 @@ public class CraftEventFactory {
+         }
+ 
+         PlayerInteractEvent event = new PlayerInteractEvent(player, action, itemInHand, blockClicked, blockFace);
++        if(!who.abilities.canInstantlyBuild && Item.getId(itemstack.getItem()) == 368){
++            if(willLaunchInBlock(who)){
++                event.setCancelled(true);
 +            }
-+
-+            return itemstack;
 +        }
-+    }
+         craftServer.getPluginManager().callEvent(event);
+ 
+         return event;
+@@ -905,4 +911,32 @@ public class CraftEventFactory {
+         entityHuman.world.getServer().getPluginManager().callEvent(event);
+         return (Cancellable) event;
+     }
 +
-+    public boolean willLaunchInBlock(EntityHuman entityhuman){
++    private static boolean willLaunchInBlock(EntityHuman entityhuman){
 +        double motX = (double) (-MathHelper.sin(entityhuman.yaw / 180.0F * 3.1415927F) * MathHelper.cos(entityhuman.pitch / 180.0F * 3.1415927F) * 0.4F);
 +        double motZ = (double) (MathHelper.cos(entityhuman.yaw / 180.0F * 3.1415927F) * MathHelper.cos(entityhuman.pitch / 180.0F * 3.1415927F) * 0.4F);
 +        double motY = (double) (-MathHelper.sin((entityhuman.pitch) / 180.0F * 3.1415927F) * 0.4F);
@@ -80,7 +78,7 @@ index 0000000..ce1289e
 +
 +        return movingobjectposition  != null && movingobjectposition.type == EnumMovingObjectType.BLOCK;
 +    }
-+}
+ }
 -- 
-1.9.1
+1.9.4.msysgit.2
 
