@@ -1,4 +1,4 @@
-From d7a045365e7319a33fcae3840c1e039254ba3a6f Mon Sep 17 00:00:00 2001
+From 4998200d76c198c3f72fc42cc1a129e4426e87a8 Mon Sep 17 00:00:00 2001
 From: libhalt <libhalt@libhalt.net>
 Date: Sat, 27 Sep 2014 13:19:13 +0900
 Subject: [PATCH] FEAT: Significantly harder to ender pearl glitch
@@ -23,7 +23,7 @@ index 650005f..8b0ecce 100644
              vec3d1 = Vec3D.a(movingobjectposition.pos.a, movingobjectposition.pos.b, movingobjectposition.pos.c);
          }
 diff --git a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
-index cd78e15..002bc58 100644
+index cd78e15..81e4c23 100644
 --- a/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/event/CraftEventFactory.java
 @@ -33,6 +33,11 @@ import net.minecraft.server.PacketPlayOutSetSlot;
@@ -42,7 +42,7 @@ index cd78e15..002bc58 100644
          }
  
          PlayerInteractEvent event = new PlayerInteractEvent(player, action, itemInHand, blockClicked, blockFace);
-+        if(!who.abilities.canInstantlyBuild && Item.getId(itemstack.getItem()) == 368){
++        if(!who.abilities.canInstantlyBuild && itemstack != null && Item.getId(itemstack.getItem()) == 368){
 +            if(willLaunchInBlock(who)){
 +                event.setCancelled(true);
 +            }
