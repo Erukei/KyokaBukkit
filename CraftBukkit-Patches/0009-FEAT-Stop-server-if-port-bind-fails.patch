@@ -1,11 +1,11 @@
-From b76eee09f0122502eb6f6fd643ad3e23763ba0e5 Mon Sep 17 00:00:00 2001
+From aae400fddef36b8aca4c156ef53f545617243441 Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Wed, 2 Jul 2014 15:26:04 +1000
 Subject: [PATCH] FEAT: Stop server if port bind fails
 
 
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index e4dca37..c78f3fd 100644
+index 8818885..1462c18 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -474,7 +474,9 @@ public abstract class MinecraftServer implements ICommandListener, Runnable, IMo

@@ -1,0 +1,63 @@
+From 2e3b48ac7f49738197ba8e7fb723b08c8d025bbd Mon Sep 17 00:00:00 2001
+From: libhalt <libhalt@libhalt.net>
+Date: Tue, 11 Nov 2014 23:27:42 +0900
+Subject: [PATCH] CORE: Non plugin referensing queue
+
+
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index e4dca37..8818885 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -598,6 +598,7 @@ public abstract class MinecraftServer implements ICommandListener, Runnable, IMo
+ 
+         // CraftBukkit start
+         this.server.getScheduler().mainThreadHeartbeat(this.ticks);
++        nl.hiraku.kyoka.KyokaTicker.tick(this.ticks);
+ 
+         // Run tasks that are waiting on processing
+         while (!processQueue.isEmpty()) {
+diff --git a/src/main/java/nl/hiraku/kyoka/KyokaTicker.java b/src/main/java/nl/hiraku/kyoka/KyokaTicker.java
+new file mode 100644
+index 0000000..6fcfa46
+--- /dev/null
++++ b/src/main/java/nl/hiraku/kyoka/KyokaTicker.java
+@@ -0,0 +1,36 @@
++package nl.hiraku.kyoka;
++
++import com.google.common.base.Preconditions;
++
++import java.util.*;
++
++public class KyokaTicker {
++
++    private static List<Runnable> tickable = new ArrayList<>();
++
++    private static Map<Runnable , Integer> delayed = new HashMap<>();
++
++    public static void tick(int currentick){
++        for(Runnable tick : tickable){
++            tick.run();
++        }
++        Iterator<Map.Entry<Runnable , Integer>> entryIterator = delayed.entrySet().iterator();
++        while(entryIterator.hasNext()){
++            Map.Entry<Runnable , Integer> entry = entryIterator.next();
++            entry.setValue(entry.getValue() - 1);
++            if(entry.getValue() <= 0){
++                entry.getKey().run();
++                entryIterator.remove();
++            }
++        }
++    }
++
++    static void delay(Runnable runnable , int tick){
++        delayed.put(runnable , tick );
++    }
++
++    static void addTimer(Runnable tick){
++        Preconditions.checkState(!tickable.contains(tick));
++        tickable.add(tick);
++    }
++}
+-- 
+1.9.4.msysgit.2
+

@@ -1,4 +1,4 @@
-From cf3604d863a11579628892af325cd3ae3a43f530 Mon Sep 17 00:00:00 2001
+From c4a1a900d4b60e3b3dc103fe664466bdddd742fc Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Sat, 23 Aug 2014 21:11:35 +1000
 Subject: [PATCH] API: Hunger revert API
