@@ -1,4 +1,4 @@
-From 2e3b48ac7f49738197ba8e7fb723b08c8d025bbd Mon Sep 17 00:00:00 2001
+From d253215ed6fbe56147fe9324de960bb25591a11f Mon Sep 17 00:00:00 2001
 From: libhalt <libhalt@libhalt.net>
 Date: Tue, 11 Nov 2014 23:27:42 +0900
 Subject: [PATCH] CORE: Non plugin referensing queue
@@ -18,10 +18,10 @@ index e4dca37..8818885 100644
          while (!processQueue.isEmpty()) {
 diff --git a/src/main/java/nl/hiraku/kyoka/KyokaTicker.java b/src/main/java/nl/hiraku/kyoka/KyokaTicker.java
 new file mode 100644
-index 0000000..6fcfa46
+index 0000000..9b1cf17
 --- /dev/null
 +++ b/src/main/java/nl/hiraku/kyoka/KyokaTicker.java
-@@ -0,0 +1,36 @@
+@@ -0,0 +1,40 @@
 +package nl.hiraku.kyoka;
 +
 +import com.google.common.base.Preconditions;
@@ -30,13 +30,17 @@ index 0000000..6fcfa46
 +
 +public class KyokaTicker {
 +
-+    private static List<Runnable> tickable = new ArrayList<>();
++    private static List<KyokaTimer> tickable = new ArrayList<>();
 +
 +    private static Map<Runnable , Integer> delayed = new HashMap<>();
 +
 +    public static void tick(int currentick){
-+        for(Runnable tick : tickable){
-+            tick.run();
++        Iterator<KyokaTimer> tickableIter = tickable.iterator();
++        while(tickableIter.hasNext()){
++            KyokaTimer timer = tickableIter.next();
++            if(!timer.tick()){
++                tickableIter.remove();
++            }
 +        }
 +        Iterator<Map.Entry<Runnable , Integer>> entryIterator = delayed.entrySet().iterator();
 +        while(entryIterator.hasNext()){
@@ -53,10 +57,22 @@ index 0000000..6fcfa46
 +        delayed.put(runnable , tick );
 +    }
 +
-+    static void addTimer(Runnable tick){
++    static void addTimer(KyokaTimer tick){
 +        Preconditions.checkState(!tickable.contains(tick));
 +        tickable.add(tick);
 +    }
++}
+diff --git a/src/main/java/nl/hiraku/kyoka/KyokaTimer.java b/src/main/java/nl/hiraku/kyoka/KyokaTimer.java
+new file mode 100644
+index 0000000..b965a2c
+--- /dev/null
++++ b/src/main/java/nl/hiraku/kyoka/KyokaTimer.java
+@@ -0,0 +1,6 @@
++package nl.hiraku.kyoka;
++
++interface KyokaTimer {
++
++    public boolean tick();
 +}
 -- 
 1.9.4.msysgit.2
