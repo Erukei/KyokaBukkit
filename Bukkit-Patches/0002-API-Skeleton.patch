@@ -1,18 +1,52 @@
-From e929a25e01f8dc474d4a179fe088adc55ada1ef3 Mon Sep 17 00:00:00 2001
+From e93a9372be091d00750805269550f7f07ce19093 Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Wed, 2 Jul 2014 15:47:05 +1000
 Subject: [PATCH] API: Skeleton
 
 
+diff --git a/src/main/java/nl/hiraku/kyoka/Kyoka.java b/src/main/java/nl/hiraku/kyoka/Kyoka.java
+new file mode 100644
+index 0000000..12541d0
+--- /dev/null
++++ b/src/main/java/nl/hiraku/kyoka/Kyoka.java
+@@ -0,0 +1,5 @@
++package nl.hiraku.kyoka;
++
++public interface Kyoka {
++
++}
+diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
+index 1eaf92d..668bf86 100644
+--- a/src/main/java/org/bukkit/Bukkit.java
++++ b/src/main/java/org/bukkit/Bukkit.java
+@@ -747,4 +747,11 @@ public final class Bukkit {
+     public static UnsafeValues getUnsafe() {
+         return server.getUnsafe();
+     }
++
++    /**
++     * @see Server#getKyoka()
++     */
++    public static nl.hiraku.kyoka.Kyoka getKyoka(){
++        return server.getKyoka();
++    }
+ }
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index e14e9f1..362c2c4 100644
+index e14e9f1..eb3dfd7 100644
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
-@@ -916,4 +916,5 @@ public interface Server extends PluginMessageRecipient {
+@@ -916,4 +916,12 @@ public interface Server extends PluginMessageRecipient {
       */
      @Deprecated
      UnsafeValues getUnsafe();
 +
++
++    /**
++     * Gets the Kyoka object for enhanced API
++     *
++     * @return the kyoka singleton
++     */
++    nl.hiraku.kyoka.Kyoka getKyoka();
  }
 diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
 index fe8a0bd..e5155b8 100644
@@ -29,5 +63,5 @@ index fe8a0bd..e5155b8 100644
 +    // Kyoka end
  }
 -- 
-1.9.1
+1.9.4.msysgit.2
 
