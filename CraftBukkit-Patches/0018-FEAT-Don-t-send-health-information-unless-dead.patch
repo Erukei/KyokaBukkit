@@ -1,4 +1,4 @@
-From ff31515643a94c5feff33e9dfdc0d9b7efd63741 Mon Sep 17 00:00:00 2001
+From 80e0ed8a65ffd7a108074f2bec00b1c476016c2a Mon Sep 17 00:00:00 2001
 From: libhalt <libhalt@libhalt.net>
 Date: Mon, 22 Sep 2014 15:04:29 +0900
 Subject: [PATCH] FEAT: Don't send health information unless dead
@@ -98,7 +98,7 @@ index b2a3f61..be8cfae 100644
      }
  
 diff --git a/src/main/java/net/minecraft/server/PacketPlayOutSpawnEntityLiving.java b/src/main/java/net/minecraft/server/PacketPlayOutSpawnEntityLiving.java
-index 5829535..dcef360 100644
+index ec5dedd..9b640d0 100644
 --- a/src/main/java/net/minecraft/server/PacketPlayOutSpawnEntityLiving.java
 +++ b/src/main/java/net/minecraft/server/PacketPlayOutSpawnEntityLiving.java
 @@ -91,7 +91,7 @@ public class PacketPlayOutSpawnEntityLiving extends Packet {

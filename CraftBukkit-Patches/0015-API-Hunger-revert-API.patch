@@ -1,4 +1,4 @@
-From 45168a983f04611ebc3fc467b0e2950ea12bb195 Mon Sep 17 00:00:00 2001
+From cf3604d863a11579628892af325cd3ae3a43f530 Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Sat, 23 Aug 2014 21:11:35 +1000
 Subject: [PATCH] API: Hunger revert API
@@ -56,5 +56,5 @@ index 1c87a18..31991a3 100644
  
      public Kyoka kyoka() {
 -- 
-1.9.1
+1.9.4.msysgit.2
 

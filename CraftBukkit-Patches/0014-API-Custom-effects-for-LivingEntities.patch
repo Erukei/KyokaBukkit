@@ -1,4 +1,4 @@
-From db1099f68a92a9e43a9a1f673be2aa8059f9d01a Mon Sep 17 00:00:00 2001
+From b719473bac4a09f97950b33046d69a828f3c4aea Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Sat, 23 Aug 2014 20:10:36 +1000
 Subject: [PATCH] API: Custom effects for LivingEntities
@@ -529,5 +529,5 @@ index add554e..4ad903d 100644
 +    // Kyoka end
  }
 -- 
-1.9.1
+1.9.4.msysgit.2
 

@@ -1,6 +1,6 @@
+From 766d6c7323275688ea1fcd492dd6453b0d8c5c40 Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Fri, 4 Jul 2014 18:00:39 +1000
-From fa0316632167fefbbd90a99f1370b2929c094568 Mon Sep 17 00:00:00 2001
 Subject: [PATCH] API: Entity collision
 
 
@@ -55,7 +55,7 @@ index 26ae01a..e91e5a2 100644
      public EntityPlayer(MinecraftServer minecraftserver, WorldServer worldserver, GameProfile gameprofile, PlayerInteractManager playerinteractmanager) {
          super(worldserver, gameprofile);
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index b22ca1b..07c666c 100644
+index 6c3cac6..1c87a18 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 @@ -1363,6 +1363,17 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
@@ -77,5 +77,5 @@ index b22ca1b..07c666c 100644
  
      public Kyoka kyoka() {
 -- 
-1.9.1
+1.9.4.msysgit.2
 

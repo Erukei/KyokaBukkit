@@ -1,4 +1,4 @@
-From ccce842b32605e86163ad0ce44d9cd92488530f3 Mon Sep 17 00:00:00 2001
+From 23c96ef569072b951a15f03d0387a8e884f659fa Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Fri, 4 Jul 2014 20:49:24 +1000
 Subject: [PATCH] API: Custom visbility API for kit pvp servers

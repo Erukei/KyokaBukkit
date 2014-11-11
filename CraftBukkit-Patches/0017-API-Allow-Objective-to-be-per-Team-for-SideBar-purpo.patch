@@ -1,24 +1,9 @@
-From c79ebf4c1d9b8c89ed9c82ad106fbdc7c1a20c84 Mon Sep 17 00:00:00 2001
+From 52ac8f03ad2547ce8050c2104b5a116fc5a0dff8 Mon Sep 17 00:00:00 2001
 From: libhalt <libhalt@libhalt.net>
 Date: Sun, 31 Aug 2014 01:43:37 +0900
 Subject: [PATCH] API: Allow Objective to be per Team for SideBar purposes
 
 
-diff --git a/src/main/java/net/minecraft/server/PacketPlayOutScoreboardScore.java b/src/main/java/net/minecraft/server/PacketPlayOutScoreboardScore.java
-index 446e308..648dff7 100644
---- a/src/main/java/net/minecraft/server/PacketPlayOutScoreboardScore.java
-+++ b/src/main/java/net/minecraft/server/PacketPlayOutScoreboardScore.java
-@@ -4,8 +4,8 @@ import java.io.IOException;
- 
- public class PacketPlayOutScoreboardScore extends Packet {
- 
--    private String a = "";
--    private String b = "";
-+    public String a = "";
-+    public String b = "";
-     private int c;
-     private int d;
- 
 diff --git a/src/main/java/net/minecraft/server/PlayerList.java b/src/main/java/net/minecraft/server/PlayerList.java
 index 9a36001..d6853dd 100644
 --- a/src/main/java/net/minecraft/server/PlayerList.java

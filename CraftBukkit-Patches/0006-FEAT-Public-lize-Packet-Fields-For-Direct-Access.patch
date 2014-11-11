@@ -1,0 +1,138 @@
+From ac8ccc4055961f0dadec55d0933f0a4ac104a5df Mon Sep 17 00:00:00 2001
+From: libhalt <libhalt@libhalt.net>
+Date: Tue, 11 Nov 2014 23:03:03 +0900
+Subject: [PATCH] FEAT:Public-lize Packet Fields For Direct Access
+
+
+diff --git a/src/main/java/net/minecraft/server/PacketPlayOutNamedEntitySpawn.java b/src/main/java/net/minecraft/server/PacketPlayOutNamedEntitySpawn.java
+index ecc28be..246843f 100644
+--- a/src/main/java/net/minecraft/server/PacketPlayOutNamedEntitySpawn.java
++++ b/src/main/java/net/minecraft/server/PacketPlayOutNamedEntitySpawn.java
+@@ -11,16 +11,16 @@ import java.io.IOException; // CraftBukkit
+ 
+ public class PacketPlayOutNamedEntitySpawn extends Packet {
+ 
+-    private int a;
+-    private GameProfile b;
+-    private int c;
+-    private int d;
+-    private int e;
+-    private byte f;
+-    private byte g;
+-    private int h;
+-    private DataWatcher i;
+-    private List j;
++    public int a;
++    public GameProfile b;
++    public int c;
++    public int d;
++    public int e;
++    public byte f;
++    public byte g;
++    public int h;
++    public DataWatcher i;
++    public List j;
+ 
+     public PacketPlayOutNamedEntitySpawn() {}
+ 
+diff --git a/src/main/java/net/minecraft/server/PacketPlayOutScoreboardObjective.java b/src/main/java/net/minecraft/server/PacketPlayOutScoreboardObjective.java
+index a976436..952edd5 100644
+--- a/src/main/java/net/minecraft/server/PacketPlayOutScoreboardObjective.java
++++ b/src/main/java/net/minecraft/server/PacketPlayOutScoreboardObjective.java
+@@ -4,9 +4,9 @@ import java.io.IOException;
+ 
+ public class PacketPlayOutScoreboardObjective extends Packet {
+ 
+-    private String a;
+-    private String b;
+-    private int c;
++    public String a;
++    public String b;
++    public int c;
+ 
+     public PacketPlayOutScoreboardObjective() {}
+ 
+diff --git a/src/main/java/net/minecraft/server/PacketPlayOutScoreboardScore.java b/src/main/java/net/minecraft/server/PacketPlayOutScoreboardScore.java
+index 446e308..fa3015f 100644
+--- a/src/main/java/net/minecraft/server/PacketPlayOutScoreboardScore.java
++++ b/src/main/java/net/minecraft/server/PacketPlayOutScoreboardScore.java
+@@ -4,10 +4,10 @@ import java.io.IOException;
+ 
+ public class PacketPlayOutScoreboardScore extends Packet {
+ 
+-    private String a = "";
+-    private String b = "";
+-    private int c;
+-    private int d;
++    public String a = "";
++    public String b = "";
++    public int c;
++    public int d;
+ 
+     public PacketPlayOutScoreboardScore() {}
+ 
+diff --git a/src/main/java/net/minecraft/server/PacketPlayOutScoreboardTeam.java b/src/main/java/net/minecraft/server/PacketPlayOutScoreboardTeam.java
+index b8a71c3..6d68327 100644
+--- a/src/main/java/net/minecraft/server/PacketPlayOutScoreboardTeam.java
++++ b/src/main/java/net/minecraft/server/PacketPlayOutScoreboardTeam.java
+@@ -6,13 +6,13 @@ import java.util.Iterator;
+ 
+ public class PacketPlayOutScoreboardTeam extends Packet {
+ 
+-    private String a = "";
+-    private String b = "";
+-    private String c = "";
+-    private String d = "";
+-    private Collection e = new ArrayList();
+-    private int f;
+-    private int g;
++    public String a = "";
++    public String b = "";
++    public String c = "";
++    public String d = "";
++    public Collection e = new ArrayList();
++    public int f;
++    public int g;
+ 
+     public PacketPlayOutScoreboardTeam() {}
+ 
+diff --git a/src/main/java/net/minecraft/server/PacketPlayOutSpawnEntityLiving.java b/src/main/java/net/minecraft/server/PacketPlayOutSpawnEntityLiving.java
+index 5829535..ec5dedd 100644
+--- a/src/main/java/net/minecraft/server/PacketPlayOutSpawnEntityLiving.java
++++ b/src/main/java/net/minecraft/server/PacketPlayOutSpawnEntityLiving.java
+@@ -4,19 +4,19 @@ import java.util.List;
+ 
+ public class PacketPlayOutSpawnEntityLiving extends Packet {
+ 
+-    private int a;
+-    private int b;
+-    private int c;
+-    private int d;
+-    private int e;
+-    private int f;
+-    private int g;
+-    private int h;
+-    private byte i;
+-    private byte j;
+-    private byte k;
+-    private DataWatcher l;
+-    private List m;
++    public int a;
++    public int b;
++    public int c;
++    public int d;
++    public int e;
++    public int f;
++    public int g;
++    public int h;
++    public byte i;
++    public byte j;
++    public byte k;
++    public DataWatcher l;
++    public List m;
+ 
+     public PacketPlayOutSpawnEntityLiving() {}
+ 
+-- 
+1.9.4.msysgit.2
+
