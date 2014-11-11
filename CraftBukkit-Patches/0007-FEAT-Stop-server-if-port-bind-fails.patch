@@ -1,11 +1,11 @@
-From b4bba235d909c021dc3eb7a5032fd4405f4a05de Mon Sep 17 00:00:00 2001
+From 75234cbe1306a5d0f92aea99d39ad7d9ceb3ee42 Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Wed, 2 Jul 2014 15:26:04 +1000
 Subject: [PATCH] FEAT: Stop server if port bind fails
 
 
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index e65cbfa..47184c5 100644
+index e4dca37..c78f3fd 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -474,7 +474,9 @@ public abstract class MinecraftServer implements ICommandListener, Runnable, IMo
@@ -20,5 +20,5 @@ index e65cbfa..47184c5 100644
          } catch (Throwable throwable) {
              i.error("Encountered an unexpected exception", throwable);
 -- 
-1.9.1
+1.9.4.msysgit.2
 

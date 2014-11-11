@@ -1,11 +1,11 @@
-From 15ac67db8f5159f845e94d691076f4d274b61a4f Mon Sep 17 00:00:00 2001
+From 49398d8343e4c6b69aa5fe34a2446fd000d86cf1 Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Tue, 1 Jul 2014 16:42:39 +1000
 Subject: [PATCH] FEAT: BungeeCord support
 
 
 diff --git a/src/main/java/net/minecraft/server/HandshakeListener.java b/src/main/java/net/minecraft/server/HandshakeListener.java
-index 52bc69b..c4dc7d1 100644
+index 073df47..5f83650 100644
 --- a/src/main/java/net/minecraft/server/HandshakeListener.java
 +++ b/src/main/java/net/minecraft/server/HandshakeListener.java
 @@ -1,5 +1,9 @@
@@ -26,7 +26,7 @@ index 52bc69b..c4dc7d1 100644
      // CraftBukkit start - add fields
      private static final HashMap<InetAddress, Long> throttleTracker = new HashMap<InetAddress, Long>();
      private static int throttleCounter = 0;
-@@ -73,6 +78,24 @@ public class HandshakeListener implements PacketHandshakingInListener {
+@@ -79,6 +84,24 @@ public class HandshakeListener implements PacketHandshakingInListener {
                  this.b.close(chatcomponenttext);
              } else {
                  this.b.a((PacketListener) (new LoginListener(this.a, this.b)));
@@ -52,18 +52,18 @@ index 52bc69b..c4dc7d1 100644
              }
              break;
 diff --git a/src/main/java/net/minecraft/server/LoginListener.java b/src/main/java/net/minecraft/server/LoginListener.java
-index 8f982f1..704f1f0 100644
+index e79983c..363b852 100644
 --- a/src/main/java/net/minecraft/server/LoginListener.java
 +++ b/src/main/java/net/minecraft/server/LoginListener.java
-@@ -9,6 +9,7 @@ import javax.crypto.SecretKey;
- 
+@@ -10,6 +10,7 @@ import javax.crypto.SecretKey;
  import net.minecraft.util.com.google.common.base.Charsets;
  import net.minecraft.util.com.mojang.authlib.GameProfile;
+ import net.minecraft.util.io.netty.util.concurrent.Future;
 +import net.minecraft.util.com.mojang.authlib.properties.Property;
  import net.minecraft.util.io.netty.util.concurrent.GenericFutureListener;
  import net.minecraft.util.org.apache.commons.lang3.Validate;
  import org.apache.logging.log4j.LogManager;
-@@ -59,10 +60,36 @@ public class LoginListener implements PacketLoginInListener {
+@@ -60,10 +61,36 @@ public class LoginListener implements PacketLoginInListener {
          }
      }
  
@@ -100,7 +100,7 @@ index 8f982f1..704f1f0 100644
  
          // CraftBukkit start - fire PlayerLoginEvent
          EntityPlayer s = this.server.getPlayerList().attemptLogin(this, this.i, this.hostname);
-@@ -97,7 +124,7 @@ public class LoginListener implements PacketLoginInListener {
+@@ -111,7 +138,7 @@ public class LoginListener implements PacketLoginInListener {
              this.g = EnumProtocolState.KEY;
              this.networkManager.handle(new PacketLoginOutEncryptionBegin(this.j, this.server.K().getPublic(), this.e), new GenericFutureListener[0]);
          } else {
@@ -110,7 +110,7 @@ index 8f982f1..704f1f0 100644
      }
  
 diff --git a/src/main/java/net/minecraft/server/NetworkManager.java b/src/main/java/net/minecraft/server/NetworkManager.java
-index 1b080c7..114b31e 100644
+index 72b7efc..22beebb 100644
 --- a/src/main/java/net/minecraft/server/NetworkManager.java
 +++ b/src/main/java/net/minecraft/server/NetworkManager.java
 @@ -6,6 +6,7 @@ import javax.crypto.SecretKey;
@@ -121,7 +121,7 @@ index 1b080c7..114b31e 100644
  import net.minecraft.util.io.netty.channel.Channel;
  import net.minecraft.util.io.netty.channel.ChannelFutureListener;
  import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
-@@ -37,7 +38,11 @@ public class NetworkManager extends SimpleChannelInboundHandler {
+@@ -42,7 +43,11 @@ public class NetworkManager extends SimpleChannelInboundHandler {
      private final Queue k = Queues.newConcurrentLinkedQueue();
      private final Queue l = Queues.newConcurrentLinkedQueue();
      private Channel m;
@@ -134,12 +134,6 @@ index 1b080c7..114b31e 100644
      private PacketListener o;
      private EnumProtocol p;
      private IChatBaseComponent q;
-@@ -207,4 +212,5 @@ public class NetworkManager extends SimpleChannelInboundHandler {
-     static Channel a(NetworkManager networkmanager) {
-         return networkmanager.m;
-     }
-+
- }
 diff --git a/src/main/java/net/minecraft/server/PacketHandshakingInSetProtocol.java b/src/main/java/net/minecraft/server/PacketHandshakingInSetProtocol.java
 index 16d4765..9dd7a70 100644
 --- a/src/main/java/net/minecraft/server/PacketHandshakingInSetProtocol.java
@@ -312,5 +306,5 @@ index 03870c1..5b11af7 100644
  
      @Override
 -- 
-1.9.1
+1.9.4.msysgit.2
 

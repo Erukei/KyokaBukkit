@@ -1,4 +1,4 @@
-From 9ed4acfe4574d1ef9c5a75fe427bf26e00a09a9c Mon Sep 17 00:00:00 2001
+From ccce842b32605e86163ad0ce44d9cd92488530f3 Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Fri, 4 Jul 2014 20:49:24 +1000
 Subject: [PATCH] API: Custom visbility API for kit pvp servers
@@ -39,10 +39,10 @@ index 88b0751..c0cdd61 100644
  
              int j;
 diff --git a/src/main/java/net/minecraft/server/EntityHuman.java b/src/main/java/net/minecraft/server/EntityHuman.java
-index 331dbac..738ed07 100644
+index c248139..601671b 100644
 --- a/src/main/java/net/minecraft/server/EntityHuman.java
 +++ b/src/main/java/net/minecraft/server/EntityHuman.java
-@@ -530,6 +530,7 @@ public abstract class EntityHuman extends EntityLiving implements ICommandListen
+@@ -532,6 +532,7 @@ public abstract class EntityHuman extends EntityLiving implements ICommandListen
          } else {
              EntityItem entityitem = new EntityItem(this.world, this.locX, this.locY - 0.30000001192092896D + (double) this.getHeadHeight(), this.locZ, itemstack);
  
@@ -136,7 +136,7 @@ index 68625a4..7874fab 100644
              // CraftBukkit end
  
 diff --git a/src/main/java/net/minecraft/server/EntityTrackerEntry.java b/src/main/java/net/minecraft/server/EntityTrackerEntry.java
-index 0cf9ad5..e1443b7 100644
+index a440042..5da7a80 100644
 --- a/src/main/java/net/minecraft/server/EntityTrackerEntry.java
 +++ b/src/main/java/net/minecraft/server/EntityTrackerEntry.java
 @@ -305,13 +305,12 @@ public class EntityTrackerEntry {
@@ -159,10 +159,10 @@ index 0cf9ad5..e1443b7 100644
                      entityplayer.removeQueue.remove(Integer.valueOf(this.tracker.getId()));
                      // CraftBukkit end
 diff --git a/src/main/java/net/minecraft/server/PlayerList.java b/src/main/java/net/minecraft/server/PlayerList.java
-index e6012fb..84c3027 100644
+index 22d7050..9a36001 100644
 --- a/src/main/java/net/minecraft/server/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/PlayerList.java
-@@ -1026,7 +1026,7 @@ public abstract class PlayerList {
+@@ -1025,7 +1025,7 @@ public abstract class PlayerList {
              EntityPlayer entityplayer = (EntityPlayer) this.players.get(j);
  
              // CraftBukkit start - Test if player receiving packet can see the source of the packet
@@ -171,7 +171,7 @@ index e6012fb..84c3027 100644
                  continue;
              }
              // CraftBukkit end
-@@ -1043,6 +1043,28 @@ public abstract class PlayerList {
+@@ -1042,6 +1042,28 @@ public abstract class PlayerList {
          }
      }
  
@@ -309,7 +309,7 @@ index f4dec5b..4df314a 100644
      public Arrow spawnArrow(Location loc, Vector velocity, float speed, float spread) {
          Validate.notNull(loc, "Can not spawn arrow with a null location");
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 1f67ece..e63de1b 100644
+index dc8b2ec..4bc2b3d 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 @@ -7,13 +7,7 @@ import java.io.ByteArrayOutputStream;
@@ -343,7 +343,7 @@ index 1f67ece..e63de1b 100644
      private int hash = 0;
      private double health = 20;
      private boolean scaledHealth = false;
-@@ -921,6 +917,31 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -930,6 +926,31 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          return !hiddenPlayers.contains(player.getUniqueId());
      }
  
@@ -375,7 +375,7 @@ index 1f67ece..e63de1b 100644
      public Map<String, Object> serialize() {
          Map<String, Object> result = new LinkedHashMap<String, Object>();
  
-@@ -1295,6 +1316,43 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -1304,6 +1325,43 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          public String getLocale() {
              return getHandle().locale;
          }

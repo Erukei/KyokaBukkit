@@ -1,4 +1,4 @@
-From 9e15447ff33142838789532d59ec5afebd6dd167 Mon Sep 17 00:00:00 2001
+From 591f5e4f4aacc954ef1e003a26ba02609366c3c2 Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Mon, 30 Jun 2014 14:41:51 +1000
 Subject: [PATCH] CORE: Kyoka configuration
@@ -70,5 +70,5 @@ index a666131..03870c1 100644
              legacyAlias = null;
          }
 -- 
-1.9.1
+1.9.4.msysgit.2
 

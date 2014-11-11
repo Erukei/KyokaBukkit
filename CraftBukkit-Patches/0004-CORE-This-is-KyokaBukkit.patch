@@ -1,11 +1,11 @@
-From c6e61a31c99f47d359f1cef3951492d1c150e1ac Mon Sep 17 00:00:00 2001
+From 3e3fe4bcc5b1f1673469e3ec1e7837494600f7c9 Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Sun, 29 Jun 2014 17:01:50 +1000
 Subject: [PATCH] CORE: This is KyokaBukkit
 
 
 diff --git a/pom.xml b/pom.xml
-index 8dc82eb..6d93397 100644
+index 33a365d..9ec2ea0 100644
 --- a/pom.xml
 +++ b/pom.xml
 @@ -1,12 +1,12 @@
@@ -68,5 +68,5 @@ index 8dc82eb..6d93397 100644
        <type>jar</type>
        <scope>compile</scope>
 -- 
-1.9.1
+1.9.4.msysgit.2
 

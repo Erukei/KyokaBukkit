@@ -1,14 +1,14 @@
-From 746230f5ae59a28409f76f3667e49c705e6177de Mon Sep 17 00:00:00 2001
+From 6c9878a9db35e6d201b6e3880e392a85a52b8512 Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Wed, 2 Jul 2014 20:51:56 +1000
 Subject: [PATCH] API: Allow access to player locale
 
 
 diff --git a/src/main/java/net/minecraft/server/EntityPlayer.java b/src/main/java/net/minecraft/server/EntityPlayer.java
-index 84673b4..6b2b60c 100644
+index c84b7b3..26ae01a 100644
 --- a/src/main/java/net/minecraft/server/EntityPlayer.java
 +++ b/src/main/java/net/minecraft/server/EntityPlayer.java
-@@ -30,7 +30,7 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+@@ -31,7 +31,7 @@ import org.spigotmc.ProtocolData; // Spigot - protocol patch
  public class EntityPlayer extends EntityHuman implements ICrafting {
  
      private static final Logger bL = LogManager.getLogger();
@@ -18,10 +18,10 @@ index 84673b4..6b2b60c 100644
      public final MinecraftServer server;
      public final PlayerInteractManager playerInteractManager;
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 083277f..1f67ece 100644
+index a54a9d0..dc8b2ec 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -1291,6 +1291,10 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -1300,6 +1300,10 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
      // Kyoka start
      private final Kyoka kyoka = new Kyoka() {
@@ -33,5 +33,5 @@ index 083277f..1f67ece 100644
  
      public Kyoka kyoka() {
 -- 
-1.9.1
+1.9.4.msysgit.2
 

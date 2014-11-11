@@ -1,14 +1,14 @@
-From 8d552e192424eb591c2d7999f6d25cd4e5b739b1 Mon Sep 17 00:00:00 2001
+From ed42dc27ccb5a19977991ec53227b3022c6f7cd5 Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Wed, 2 Jul 2014 20:49:37 +1000
 Subject: [PATCH] API: Skeleton
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index bbf310b..083277f 100644
+index e46b67c..a54a9d0 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -1287,4 +1287,14 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -1296,4 +1296,14 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          }
          collection.add(new AttributeModifiable(getHandle().getAttributeMap(), (new AttributeRanged("generic.maxHealth", scaledHealth ? healthScale : getMaxHealth(), 0.0D, Float.MAX_VALUE)).a("Max Health").a(true)));
      }
@@ -24,5 +24,5 @@ index bbf310b..083277f 100644
 +    // Kyoka end
  }
 -- 
-1.9.1
+1.9.4.msysgit.2
 
