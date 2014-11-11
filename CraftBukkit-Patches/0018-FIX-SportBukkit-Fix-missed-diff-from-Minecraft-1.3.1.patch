@@ -1,4 +1,4 @@
-From cd8ec339fc7d4a21ec575df376535f64f624b554 Mon Sep 17 00:00:00 2001
+From 3101b542cbb46135d861d940540d750fd3cced05 Mon Sep 17 00:00:00 2001
 From: mrapple <tony@oc.tc>
 Date: Thu, 31 Jul 2014 20:05:06 -0500
 Subject: [PATCH] FIX: SportBukkit Fix missed diff from Minecraft 1.3.1 update
@@ -19,5 +19,5 @@ index ae53635..ef20414 100644
                  }
                  // CraftBukkit end
 -- 
-1.9.1
+1.9.4.msysgit.2
 

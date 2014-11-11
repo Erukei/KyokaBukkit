@@ -1,4 +1,4 @@
-From 18743b88784c79034d6039a0ca45a72b34be9398 Mon Sep 17 00:00:00 2001
+From b185a34d306cb1751ec879aa38e7e183015cd3cb Mon Sep 17 00:00:00 2001
 From: libhalt <libhalt@libhalt.net>
 Date: Sun, 31 Aug 2014 01:40:24 +0900
 Subject: [PATCH] API: Allow Objective to be per Team for SideBar purposes
@@ -24,5 +24,5 @@ index 321aac7..8699b20 100644
 +    public Kyoka kyoka();
  }
 -- 
-1.9.1
+1.9.4.msysgit.2
 
