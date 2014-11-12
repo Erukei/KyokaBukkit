@@ -1,0 +1,44 @@
+From ba21ce0e66069fdab8f42a0c5411c61e8b07592c Mon Sep 17 00:00:00 2001
+From: libhalt <libhalt@libhalt.net>
+Date: Wed, 12 Nov 2014 11:38:29 +0900
+Subject: [PATCH] API: Adds a BarManager for BossBar purpose
+
+
+diff --git a/src/main/java/nl/hiraku/kyoka/BarManager.java b/src/main/java/nl/hiraku/kyoka/BarManager.java
+new file mode 100644
+index 0000000..1968e07
+--- /dev/null
++++ b/src/main/java/nl/hiraku/kyoka/BarManager.java
+@@ -0,0 +1,19 @@
++package nl.hiraku.kyoka;
++
++import org.bukkit.entity.Player;
++
++public interface BarManager {
++
++    public void setMessageWithValue(Player player , String message , float value);
++
++    public void setMessageWithPercantage(Player player , String message , double percantage);
++
++    public void setMessageWithTimer(Player player , String message , int countdown);
++
++    public void updateMessageWithValue(Player player , String message , float value);
++
++    public void updateMessageWithPercantage(Player player , String message , double percantage);
++
++    public void unsetMessage(Player player);
++
++}
+diff --git a/src/main/java/nl/hiraku/kyoka/Kyoka.java b/src/main/java/nl/hiraku/kyoka/Kyoka.java
+index 12541d0..55f51bc 100644
+--- a/src/main/java/nl/hiraku/kyoka/Kyoka.java
++++ b/src/main/java/nl/hiraku/kyoka/Kyoka.java
+@@ -2,4 +2,5 @@ package nl.hiraku.kyoka;
+ 
+ public interface Kyoka {
+ 
++    public BarManager getBarManager();
+ }
+-- 
+1.9.4.msysgit.2
+

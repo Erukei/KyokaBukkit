@@ -1,0 +1,190 @@
+From 9ab4df26f4c267778acd52b260b4b632cc35fd1d Mon Sep 17 00:00:00 2001
+From: libhalt <libhalt@libhalt.net>
+Date: Wed, 12 Nov 2014 00:44:45 +0900
+Subject: [PATCH] API: Adds a BarManager for BossBar purpose
+
+
+diff --git a/src/main/java/net/minecraft/server/PlayerList.java b/src/main/java/net/minecraft/server/PlayerList.java
+index d6853dd..f0620e1 100644
+--- a/src/main/java/net/minecraft/server/PlayerList.java
++++ b/src/main/java/net/minecraft/server/PlayerList.java
+@@ -550,6 +550,7 @@ public abstract class PlayerList {
+             PlayerChangedWorldEvent event = new PlayerChangedWorldEvent((Player) entityplayer1.getBukkitEntity(), fromWorld);
+             Bukkit.getServer().getPluginManager().callEvent(event);
+         }
++        nl.hiraku.kyoka.KyokaBarManager.INSTANCE.resend(entityplayer1.getBukkitEntity());
+ 
+         // Save player file again if they were disconnected
+         if (entityplayer.playerConnection.isDisconnected()) {
+diff --git a/src/main/java/nl/hiraku/kyoka/KyokaBarManager.java b/src/main/java/nl/hiraku/kyoka/KyokaBarManager.java
+new file mode 100644
+index 0000000..aed3973
+--- /dev/null
++++ b/src/main/java/nl/hiraku/kyoka/KyokaBarManager.java
+@@ -0,0 +1,122 @@
++package nl.hiraku.kyoka;
++
++import com.google.common.base.Preconditions;
++import net.minecraft.server.*;
++import org.bukkit.craftbukkit.entity.CraftPlayer;
++import org.bukkit.entity.Player;
++
++import java.util.HashMap;
++import java.util.Map;
++
++public class KyokaBarManager implements BarManager {
++    private static final int BAR_DRAGON_ENTITY_ID = 12041212;
++    private static Map<Player, BarData> barData = new HashMap<>();
++    public static final KyokaBarManager INSTANCE = new KyokaBarManager();
++
++    @Override
++    public void setMessageWithValue(Player player, String message, float value) {
++        EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
++        PacketPlayOutSpawnEntityLiving entitySpawnPacket = new PacketPlayOutSpawnEntityLiving();
++        entitySpawnPacket.a = BAR_DRAGON_ENTITY_ID;
++        entitySpawnPacket.b = 63;
++        entitySpawnPacket.c = (int) entityPlayer.locX * 32;
++        entitySpawnPacket.d = -200 * 32;
++        entitySpawnPacket.e = (int) entityPlayer.locZ * 32;
++        entitySpawnPacket.l = getEnderDragonDataWatcher(message, value);
++        entitySpawnPacket.obfuscate = false;
++        entityPlayer.playerConnection.sendPacket(entitySpawnPacket);
++        BarData data = new BarData(message , value);
++        barData.put(player , data);
++    }
++
++    @Override
++    public void setMessageWithPercantage(Player player, String message, double percantage) {
++        setMessageWithValue(player, message, (float) (percantage * 200));
++    }
++
++    @Override
++    public void setMessageWithTimer(final Player player, final String message, final int countdown) {
++        setMessageWithValue(player, message,  200.0F);
++        KyokaTimer timer = new KyokaTimer() {
++            private float time = countdown;
++
++            @Override
++            public boolean tick() {
++                if (time < 0) {
++                    unsetMessage(player);
++                    return false;
++                } else {
++                    updateMessageWithValue(player, message, (time / countdown) * 200.0F);
++                }
++                time--;
++                return true;
++            }
++        };
++        KyokaTicker.addTimer(timer);
++    }
++
++    @Override
++    public void updateMessageWithValue(Player player, String message, float value) {
++        Preconditions.checkState(barData.containsKey(player));
++        barData.get(player).update(message , value);
++        PacketPlayOutEntityMetadata packetEntityMeta = new PacketPlayOutEntityMetadata(BAR_DRAGON_ENTITY_ID, getEnderDragonDataWatcher(message, value), true);
++        packetEntityMeta.obfuscate = false;
++        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetEntityMeta);
++    }
++
++    @Override
++    public void updateMessageWithPercantage(Player player, String message, double percantage) {
++        updateMessageWithValue(player, message, (float) (percantage * 200));
++    }
++
++    @Override
++    public void unsetMessage(Player player) {
++        PacketPlayOutEntityDestroy entityDestroyPacket = new PacketPlayOutEntityDestroy(BAR_DRAGON_ENTITY_ID);
++        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(entityDestroyPacket);
++        barData.remove(player);
++    }
++
++    public boolean isBarActive(Player player){
++        return barData.containsKey(player);
++    }
++
++    public void resend(Player player){
++        if(!isBarActive(player)){
++            return;
++        }
++        BarData data = barData.get(player);
++        unsetMessage(player);
++        setMessageWithValue(player , data.message , data.value);
++    }
++
++    public void onLogout(Player player){
++        barData.remove(player);
++    }
++
++
++
++    private DataWatcher getEnderDragonDataWatcher(String text, float value) {
++        //Why? using wrapper class CLARIFY which object we are using and wont use wrong object due to ambiguous Object Parameter
++        DataWatcher watcher = new DataWatcher(null);
++        watcher.a(0, Byte.valueOf((byte) 32));
++        watcher.a(6, Float.valueOf(Math.max(1, value)));
++        watcher.a(7, Integer.valueOf(0));
++        watcher.a(8, Byte.valueOf((byte) 0));
++        watcher.a(10, text);
++        watcher.a(11, Byte.valueOf((byte) 1));
++        return watcher;
++    }
++
++    static class BarData{
++        public String message;
++        public float value;
++        public BarData(String message, float value){
++            update(message , value);
++        }
++        public void update(String message , float value){
++            this.message = message;
++            this.value = value;
++        }
++
++    }
++}
+diff --git a/src/main/java/nl/hiraku/kyoka/KyokaImpl.java b/src/main/java/nl/hiraku/kyoka/KyokaImpl.java
+index 87a7a7b..84dcbbb 100644
+--- a/src/main/java/nl/hiraku/kyoka/KyokaImpl.java
++++ b/src/main/java/nl/hiraku/kyoka/KyokaImpl.java
+@@ -1,5 +1,16 @@
+ package nl.hiraku.kyoka;
+ 
++import org.bukkit.entity.Player;
++
+ public class KyokaImpl implements Kyoka {
+ 
++
++    @Override
++    public BarManager getBarManager() {
++        return KyokaBarManager.INSTANCE;
++    }
++
++    public static void handleLogout(Player player){
++        KyokaBarManager.INSTANCE.onLogout(player);
++    }
+ }
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+index 31991a3..74214d3 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+@@ -504,6 +504,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+         } else {
+             server.getHandle().moveToWorld(entity, toWorld.dimension, true, to, true);
+         }
++        nl.hiraku.kyoka.KyokaBarManager.INSTANCE.resend(this);
+         return true;
+     }
+ 
+@@ -921,6 +922,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+ 
+     public void removeDisconnectingPlayer(Player player) {
+         hiddenPlayers.remove(player.getUniqueId());
++        nl.hiraku.kyoka.KyokaImpl.handleLogout(player);
+     }
+ 
+     public boolean canSee(Player player) {
+-- 
+1.9.4.msysgit.2
+

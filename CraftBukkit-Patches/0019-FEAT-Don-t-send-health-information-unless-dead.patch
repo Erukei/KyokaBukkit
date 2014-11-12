@@ -1,4 +1,4 @@
-From 3d741b5679514b2d85ca128e525bbd630f68d053 Mon Sep 17 00:00:00 2001
+From 83ecdb5c2e550a0a3af0ba7f8c7af08b0df22400 Mon Sep 17 00:00:00 2001
 From: libhalt <libhalt@libhalt.net>
 Date: Mon, 22 Sep 2014 15:04:29 +0900
 Subject: [PATCH] FEAT: Don't send health information unless dead
@@ -98,15 +98,23 @@ index b2a3f61..be8cfae 100644
      }
  
 diff --git a/src/main/java/net/minecraft/server/PacketPlayOutSpawnEntityLiving.java b/src/main/java/net/minecraft/server/PacketPlayOutSpawnEntityLiving.java
-index ec5dedd..9b640d0 100644
+index ec5dedd..5729a8d 100644
 --- a/src/main/java/net/minecraft/server/PacketPlayOutSpawnEntityLiving.java
 +++ b/src/main/java/net/minecraft/server/PacketPlayOutSpawnEntityLiving.java
-@@ -91,7 +91,7 @@ public class PacketPlayOutSpawnEntityLiving extends Packet {
+@@ -17,6 +17,7 @@ public class PacketPlayOutSpawnEntityLiving extends Packet {
+     public byte k;
+     public DataWatcher l;
+     public List m;
++    public boolean obfuscate = true;
+ 
+     public PacketPlayOutSpawnEntityLiving() {}
+ 
+@@ -91,7 +92,7 @@ public class PacketPlayOutSpawnEntityLiving extends Packet {
          packetdataserializer.writeShort(this.f);
          packetdataserializer.writeShort(this.g);
          packetdataserializer.writeShort(this.h);
 -        this.l.a(packetdataserializer, packetdataserializer.version); // Spigot
-+        this.l.a(packetdataserializer, packetdataserializer.version , true); // Spigot
++        this.l.a(packetdataserializer, packetdataserializer.version , obfuscate); // Spigot
      }
  
      public void a(PacketPlayOutListener packetplayoutlistener) {
