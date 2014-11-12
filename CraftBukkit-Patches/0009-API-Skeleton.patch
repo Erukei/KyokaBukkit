@@ -1,19 +1,36 @@
-From b14796667d24030a441c15027cbfb2f61948545e Mon Sep 17 00:00:00 2001
+From 5ff540cbbe04daf24edff0cfc8c230ed1fd26618 Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Wed, 2 Jul 2014 20:49:37 +1000
 Subject: [PATCH] API: Skeleton
 
 
+diff --git a/src/main/java/net/minecraft/server/PlayerList.java b/src/main/java/net/minecraft/server/PlayerList.java
+index 22d7050..bc30236 100644
+--- a/src/main/java/net/minecraft/server/PlayerList.java
++++ b/src/main/java/net/minecraft/server/PlayerList.java
+@@ -336,6 +336,7 @@ public abstract class PlayerList {
+         // This removes the scoreboard (and player reference) for the specific player in the manager
+         this.cserver.getScoreboardManager().removePlayer(entityplayer.getBukkitEntity());
+ 
++        nl.hiraku.kyoka.KyokaImpl.handleLogout(entityplayer.getBukkitEntity());
+         return playerQuitEvent.getQuitMessage();
+         // CraftBukkit end
+     }
 diff --git a/src/main/java/nl/hiraku/kyoka/KyokaImpl.java b/src/main/java/nl/hiraku/kyoka/KyokaImpl.java
 new file mode 100644
-index 0000000..87a7a7b
+index 0000000..4309b06
 --- /dev/null
 +++ b/src/main/java/nl/hiraku/kyoka/KyokaImpl.java
-@@ -0,0 +1,5 @@
+@@ -0,0 +1,10 @@
 +package nl.hiraku.kyoka;
++
++import org.bukkit.entity.Player;
 +
 +public class KyokaImpl implements Kyoka {
 +
++    public static void handleLogout(Player player){
++
++    }
 +}
 diff --git a/src/main/java/nl/hiraku/kyoka/KyokaTicker.java b/src/main/java/nl/hiraku/kyoka/KyokaTicker.java
 index 9b1cf17..ea4fceb 100644

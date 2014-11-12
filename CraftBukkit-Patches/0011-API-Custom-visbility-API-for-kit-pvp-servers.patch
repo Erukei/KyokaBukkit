@@ -1,4 +1,4 @@
-From 572475e451ea080d8bfc04dd56a124d4ff09a317 Mon Sep 17 00:00:00 2001
+From 2530e3474db10181b441f2f1911ae728b9be1dfd Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Fri, 4 Jul 2014 20:49:24 +1000
 Subject: [PATCH] API: Custom visbility API for kit pvp servers
@@ -159,10 +159,10 @@ index a440042..5da7a80 100644
                      entityplayer.removeQueue.remove(Integer.valueOf(this.tracker.getId()));
                      // CraftBukkit end
 diff --git a/src/main/java/net/minecraft/server/PlayerList.java b/src/main/java/net/minecraft/server/PlayerList.java
-index 22d7050..9a36001 100644
+index bc30236..b7c8445 100644
 --- a/src/main/java/net/minecraft/server/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/PlayerList.java
-@@ -1025,7 +1025,7 @@ public abstract class PlayerList {
+@@ -1026,7 +1026,7 @@ public abstract class PlayerList {
              EntityPlayer entityplayer = (EntityPlayer) this.players.get(j);
  
              // CraftBukkit start - Test if player receiving packet can see the source of the packet
@@ -171,7 +171,7 @@ index 22d7050..9a36001 100644
                  continue;
              }
              // CraftBukkit end
-@@ -1042,6 +1042,28 @@ public abstract class PlayerList {
+@@ -1043,6 +1043,28 @@ public abstract class PlayerList {
          }
      }
  
