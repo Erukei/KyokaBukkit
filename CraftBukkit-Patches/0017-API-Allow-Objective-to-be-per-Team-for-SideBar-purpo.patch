@@ -1,4 +1,4 @@
-From 1ba0feb4db1dfe9b1ee40232cf1be0c2bc4b443f Mon Sep 17 00:00:00 2001
+From e3be82b42283536779e37db4c0ae3f05b9955ecf Mon Sep 17 00:00:00 2001
 From: libhalt <libhalt@libhalt.net>
 Date: Sun, 31 Aug 2014 01:43:37 +0900
 Subject: [PATCH] API: Allow Objective to be per Team for SideBar purposes

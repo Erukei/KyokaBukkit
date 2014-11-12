@@ -1,7 +1,7 @@
-From ac8ccc4055961f0dadec55d0933f0a4ac104a5df Mon Sep 17 00:00:00 2001
+From 7a4674985a3a4cf3b0dde8c0608873c3f4a198dd Mon Sep 17 00:00:00 2001
 From: libhalt <libhalt@libhalt.net>
 Date: Tue, 11 Nov 2014 23:03:03 +0900
-Subject: [PATCH] FEAT:Public-lize Packet Fields For Direct Access
+Subject: [PATCH] FEAT: Public-lize Packet Fields For Direct Access
 
 
 diff --git a/src/main/java/net/minecraft/server/PacketPlayOutNamedEntitySpawn.java b/src/main/java/net/minecraft/server/PacketPlayOutNamedEntitySpawn.java

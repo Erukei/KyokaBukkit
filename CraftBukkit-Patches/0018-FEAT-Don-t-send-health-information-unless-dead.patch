@@ -1,4 +1,4 @@
-From 83ecdb5c2e550a0a3af0ba7f8c7af08b0df22400 Mon Sep 17 00:00:00 2001
+From e0595dd8703fcd95164454b4e832648cc8829b60 Mon Sep 17 00:00:00 2001
 From: libhalt <libhalt@libhalt.net>
 Date: Mon, 22 Sep 2014 15:04:29 +0900
 Subject: [PATCH] FEAT: Don't send health information unless dead
