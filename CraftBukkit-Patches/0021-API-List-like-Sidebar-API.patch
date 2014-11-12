@@ -1,4 +1,4 @@
-From 60f342269cf865fec14dc1da8d22f24972192bb2 Mon Sep 17 00:00:00 2001
+From 514c11616215441f11019346f60d602de09a2eca Mon Sep 17 00:00:00 2001
 From: libhalt <libhalt@libhalt.net>
 Date: Wed, 12 Nov 2014 15:04:33 +0900
 Subject: [PATCH] API: List-like Sidebar API
@@ -86,21 +86,22 @@ index 67e60f6..4a177bf 100644
      }
 diff --git a/src/main/java/nl/hiraku/kyoka/KyokaSidebar.java b/src/main/java/nl/hiraku/kyoka/KyokaSidebar.java
 new file mode 100644
-index 0000000..1845604
+index 0000000..ac39e1a
 --- /dev/null
 +++ b/src/main/java/nl/hiraku/kyoka/KyokaSidebar.java
-@@ -0,0 +1,113 @@
+@@ -0,0 +1,126 @@
 +package nl.hiraku.kyoka;
 +
 +import com.google.common.base.Preconditions;
 +import net.minecraft.server.PacketPlayOutScoreboardDisplayObjective;
 +import net.minecraft.server.PacketPlayOutScoreboardObjective;
 +import net.minecraft.server.PacketPlayOutScoreboardScore;
-+import org.bukkit.Bukkit;
++import net.minecraft.server.PacketPlayOutScoreboardTeam;
++import org.apache.commons.lang.StringUtils;
 +import org.bukkit.craftbukkit.entity.CraftPlayer;
-+import org.bukkit.entity.Player;
 +
 +import java.util.Arrays;
++import java.util.UUID;
 +
 +
 +public class KyokaSidebar implements SideBar{
@@ -115,7 +116,7 @@ index 0000000..1845604
 +    }
 +    @Override
 +    public void addText(String text) {
-+        Preconditions.checkState(text.length() < 16);
++        Preconditions.checkState(text.length() < 48 , "length is longer than 48");
 +        for(int i = 0 ; i < texts.length ; i++){
 +            if(texts[i] == null){
 +                texts[i] = text;
@@ -144,7 +145,6 @@ index 0000000..1845604
 +    @Override
 +    public void setName(String sidebarName) {
 +        this.name = sidebarName;
-+        update();
 +    }
 +
 +    @Override
@@ -187,11 +187,25 @@ index 0000000..1845604
 +        display.a = 1;
 +        display.b = OBJECTIVE_NAME;
 +        player.getHandle().playerConnection.sendPacket(display);
-+        int count = 15;
++        int count = -1;
 +        for(String text : texts){
 +            if(text != null) {
++                String nameToSend = text;
++                if(text.length() > 16){
++                    int substring = (text.length() - 16) / 2;
++                    nameToSend = text.substring(substring , substring + 16);
++                    PacketPlayOutScoreboardTeam team = new PacketPlayOutScoreboardTeam();
++                    team.a = StringUtils.left(UUID.randomUUID().toString(), 16);
++                    team.b = nameToSend;
++                    team.c = text.substring(0 , substring);
++                    team.d = text.substring(substring  + 16 , text.length());
++                    team.f = 0;
++                    team.g = 0;
++                    team.e.add(nameToSend);
++                    player.getHandle().playerConnection.sendPacket(team);
++                }
 +                PacketPlayOutScoreboardScore score = new PacketPlayOutScoreboardScore();
-+                score.a = text;
++                score.a = nameToSend;
 +                score.b = OBJECTIVE_NAME;
 +                score.c = count;
 +                score.d = 0;
@@ -199,7 +213,6 @@ index 0000000..1845604
 +                count--;
 +            }
 +        }
-+
 +    }
 +
 +}
@@ -241,5 +254,5 @@ index 9eaec71..26288dd 100644
          ScoreboardObjective objective = this.objective;
  
 -- 
-1.9.4.msysgit.2
+1.9.3 (Apple Git-50)
 
