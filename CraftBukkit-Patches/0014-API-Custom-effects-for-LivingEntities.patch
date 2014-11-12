@@ -1,11 +1,11 @@
-From bdea3a80a0af22908bb5e4cb7358a46881d64401 Mon Sep 17 00:00:00 2001
+From 8f4b9de489c089eecaa985c5dfab61b8fd8a208d Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Sat, 23 Aug 2014 20:10:36 +1000
 Subject: [PATCH] API: Custom effects for LivingEntities
 
 
 diff --git a/src/main/java/net/minecraft/server/EntityLiving.java b/src/main/java/net/minecraft/server/EntityLiving.java
-index 762c6d9..d2a5e55 100644
+index 762c6d9..4bbd0e2 100644
 --- a/src/main/java/net/minecraft/server/EntityLiving.java
 +++ b/src/main/java/net/minecraft/server/EntityLiving.java
 @@ -82,6 +82,11 @@ public abstract class EntityLiving extends Entity {
@@ -13,9 +13,9 @@ index 762c6d9..d2a5e55 100644
      ArrayList<org.bukkit.inventory.ItemStack> drops = null;
      // CraftBukkit end
 +    // Kyoka start
-+    HashMap<Integer, Integer> effectTickRates = new HashMap<>();
-+    HashMap<Integer, Integer> effectAmounts = new HashMap<>();
-+    HashMap<Integer, Integer> effectOperations = new HashMap<>();
++    HashMap<Integer, Integer> effectTickRates = new HashMap<Integer, Integer>();
++    HashMap<Integer, Integer> effectAmounts = new HashMap<Integer, Integer>();
++    HashMap<Integer, Integer> effectOperations = new HashMap<Integer, Integer>();
 +    // Kyoka end
  
      public EntityLiving(World world) {

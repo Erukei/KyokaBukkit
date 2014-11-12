@@ -1,4 +1,4 @@
-From 3a2a9dfffd3d23a5669fff02f86b0378db62632e Mon Sep 17 00:00:00 2001
+From 8bcf2db13d198b2f694de5dfbc6fd5c53ab5b9c5 Mon Sep 17 00:00:00 2001
 From: libhalt <libhalt@libhalt.net>
 Date: Wed, 12 Nov 2014 00:44:45 +0900
 Subject: [PATCH] API: Adds a BarManager for BossBar purpose
@@ -18,7 +18,7 @@ index d6853dd..f0620e1 100644
          if (entityplayer.playerConnection.isDisconnected()) {
 diff --git a/src/main/java/nl/hiraku/kyoka/KyokaBarManager.java b/src/main/java/nl/hiraku/kyoka/KyokaBarManager.java
 new file mode 100644
-index 0000000..aed3973
+index 0000000..4405804
 --- /dev/null
 +++ b/src/main/java/nl/hiraku/kyoka/KyokaBarManager.java
 @@ -0,0 +1,122 @@
@@ -34,7 +34,7 @@ index 0000000..aed3973
 +
 +public class KyokaBarManager implements BarManager {
 +    private static final int BAR_DRAGON_ENTITY_ID = 12041212;
-+    private static Map<Player, BarData> barData = new HashMap<>();
++    private static Map<Player, BarData> barData = new HashMap<Player, BarData>();
 +    public static final KyokaBarManager INSTANCE = new KyokaBarManager();
 +
 +    @Override

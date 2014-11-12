@@ -1,4 +1,4 @@
-From 3f69188c3ca687bfebfdc22e537a069af64c6264 Mon Sep 17 00:00:00 2001
+From b14796667d24030a441c15027cbfb2f61948545e Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Wed, 2 Jul 2014 20:49:37 +1000
 Subject: [PATCH] API: Skeleton
@@ -15,6 +15,22 @@ index 0000000..87a7a7b
 +public class KyokaImpl implements Kyoka {
 +
 +}
+diff --git a/src/main/java/nl/hiraku/kyoka/KyokaTicker.java b/src/main/java/nl/hiraku/kyoka/KyokaTicker.java
+index 9b1cf17..ea4fceb 100644
+--- a/src/main/java/nl/hiraku/kyoka/KyokaTicker.java
++++ b/src/main/java/nl/hiraku/kyoka/KyokaTicker.java
+@@ -6,9 +6,9 @@ import java.util.*;
+ 
+ public class KyokaTicker {
+ 
+-    private static List<KyokaTimer> tickable = new ArrayList<>();
++    private static List<KyokaTimer> tickable = new ArrayList<KyokaTimer>();
+ 
+-    private static Map<Runnable , Integer> delayed = new HashMap<>();
++    private static Map<Runnable , Integer> delayed = new HashMap<Runnable , Integer>();
+ 
+     public static void tick(int currentick){
+         Iterator<KyokaTimer> tickableIter = tickable.iterator();
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 index 5b11af7..537c827 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
