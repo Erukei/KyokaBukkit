@@ -1,4 +1,4 @@
-From 514c11616215441f11019346f60d602de09a2eca Mon Sep 17 00:00:00 2001
+From 3380dc4707ca81d3050afa3396e1db545d0c9845 Mon Sep 17 00:00:00 2001
 From: libhalt <libhalt@libhalt.net>
 Date: Wed, 12 Nov 2014 15:04:33 +0900
 Subject: [PATCH] API: List-like Sidebar API
@@ -86,10 +86,10 @@ index 67e60f6..4a177bf 100644
      }
 diff --git a/src/main/java/nl/hiraku/kyoka/KyokaSidebar.java b/src/main/java/nl/hiraku/kyoka/KyokaSidebar.java
 new file mode 100644
-index 0000000..ac39e1a
+index 0000000..1c1853a
 --- /dev/null
 +++ b/src/main/java/nl/hiraku/kyoka/KyokaSidebar.java
-@@ -0,0 +1,126 @@
+@@ -0,0 +1,128 @@
 +package nl.hiraku.kyoka;
 +
 +import com.google.common.base.Preconditions;
@@ -114,12 +114,13 @@ index 0000000..ac39e1a
 +    public KyokaSidebar(CraftPlayer player){
 +        this.player = player;
 +    }
++
 +    @Override
-+    public void addText(String text) {
-+        Preconditions.checkState(text.length() < 48 , "length is longer than 48");
++    public void add(String element) {
++        Preconditions.checkState(element.length() < 48 , "length is longer than 48");
 +        for(int i = 0 ; i < texts.length ; i++){
 +            if(texts[i] == null){
-+                texts[i] = text;
++                texts[i] = element;
 +                return;
 +            }
 +        }
@@ -127,24 +128,25 @@ index 0000000..ac39e1a
 +    }
 +
 +    @Override
-+    public void setText(String text, int position) {
-+        if(position < 0 || position > 14){
++    public void set(int index , String element) {
++        Preconditions.checkState(element.length() < 48 , "length is longer than 48");
++        if(index < 0 || index > 14){
 +            throw new ArrayIndexOutOfBoundsException("position out of bound");
 +        }
-+        texts[position] = text;
++        texts[index] = element;
 +    }
 +
 +    @Override
-+    public void removeText(int position) {
-+        if(position < 0 || position > 14){
++    public void remove(int index) {
++        if(index < 0 || index > 14){
 +            throw new ArrayIndexOutOfBoundsException("position out of bound");
 +        }
-+        texts[position] = null;
++        texts[index] = null;
 +    }
 +
 +    @Override
-+    public void setName(String sidebarName) {
-+        this.name = sidebarName;
++    public void setName(String name) {
++        this.name = name;
 +    }
 +
 +    @Override
