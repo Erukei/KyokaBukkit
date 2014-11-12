@@ -1,4 +1,4 @@
-From af1eb13495687907c57b06aeddcf48e5799de53d Mon Sep 17 00:00:00 2001
+From b27c2162427e6029cadd570ef12e74ea36090cdd Mon Sep 17 00:00:00 2001
 From: mrapple <tony@oc.tc>
 Date: Thu, 31 Jul 2014 20:05:06 -0500
 Subject: [PATCH] FIX: SportBukkit Fix missed diff from Minecraft 1.3.1 update

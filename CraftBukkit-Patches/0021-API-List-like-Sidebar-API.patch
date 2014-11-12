@@ -1,0 +1,245 @@
+From 60f342269cf865fec14dc1da8d22f24972192bb2 Mon Sep 17 00:00:00 2001
+From: libhalt <libhalt@libhalt.net>
+Date: Wed, 12 Nov 2014 15:04:33 +0900
+Subject: [PATCH] API: List-like Sidebar API
+
+
+diff --git a/src/main/java/net/minecraft/server/PacketPlayOutScoreboardDisplayObjective.java b/src/main/java/net/minecraft/server/PacketPlayOutScoreboardDisplayObjective.java
+new file mode 100644
+index 0000000..e6b01b3
+--- /dev/null
++++ b/src/main/java/net/minecraft/server/PacketPlayOutScoreboardDisplayObjective.java
+@@ -0,0 +1,36 @@
++package net.minecraft.server;
++
++public class PacketPlayOutScoreboardDisplayObjective extends Packet {
++
++    public int a;
++    public String b;
++
++    public PacketPlayOutScoreboardDisplayObjective() {}
++
++    public PacketPlayOutScoreboardDisplayObjective(int i, ScoreboardObjective scoreboardobjective) {
++        this.a = i;
++        if (scoreboardobjective == null) {
++            this.b = "";
++        } else {
++            this.b = scoreboardobjective.getName();
++        }
++    }
++
++    public void a(PacketDataSerializer packetdataserializer) throws java.io.IOException{
++        this.a = packetdataserializer.readByte();
++        this.b = packetdataserializer.c(16);
++    }
++
++    public void b(PacketDataSerializer packetdataserializer)throws java.io.IOException{
++        packetdataserializer.writeByte(this.a);
++        packetdataserializer.a(this.b);
++    }
++
++    public void a(PacketPlayOutListener packetplayoutlistener) {
++        packetplayoutlistener.a(this);
++    }
++
++    public void handle(PacketListener packetlistener) {
++        this.a((PacketPlayOutListener) packetlistener);
++    }
++}
+diff --git a/src/main/java/nl/hiraku/kyoka/KyokaConfig.java b/src/main/java/nl/hiraku/kyoka/KyokaConfig.java
+index cd546ce..33fb7ca 100644
+--- a/src/main/java/nl/hiraku/kyoka/KyokaConfig.java
++++ b/src/main/java/nl/hiraku/kyoka/KyokaConfig.java
+@@ -17,6 +17,7 @@ public class KyokaConfig {
+     public static boolean bungeecord;
+     public static int itemDespawnTicks;
+     public static int arrowDespawnTicks;
++    public static boolean enhancedSidebarAPI;
+ 
+     public static void init() {
+         config = YamlConfiguration.loadConfiguration(configFile);
+@@ -56,4 +57,9 @@ public class KyokaConfig {
+         config.addDefault("arrow-despawn-ticks", 1200);
+         arrowDespawnTicks = config.getInt("arrow-despawn-ticks");
+     }
++
++    private static void enhancedSidebar() {
++        config.addDefault("enhanced-sidebar-api", false);
++        enhancedSidebarAPI = config.getBoolean("enhanced-sidebar-api");
++    }
+ }
+diff --git a/src/main/java/nl/hiraku/kyoka/KyokaImpl.java b/src/main/java/nl/hiraku/kyoka/KyokaImpl.java
+index 67e60f6..4a177bf 100644
+--- a/src/main/java/nl/hiraku/kyoka/KyokaImpl.java
++++ b/src/main/java/nl/hiraku/kyoka/KyokaImpl.java
+@@ -8,6 +8,11 @@ public class KyokaImpl implements Kyoka {
+         return KyokaBarManager.INSTANCE;
+     }
+ 
++    @Override
++    public boolean isEnhancedSidebarAvailable() {
++        return KyokaConfig.enhancedSidebarAPI;
++    }
++
+     public static void handleLogout(Player player){
+         KyokaBarManager.INSTANCE.onLogout(player);
+     }
+diff --git a/src/main/java/nl/hiraku/kyoka/KyokaSidebar.java b/src/main/java/nl/hiraku/kyoka/KyokaSidebar.java
+new file mode 100644
+index 0000000..1845604
+--- /dev/null
++++ b/src/main/java/nl/hiraku/kyoka/KyokaSidebar.java
+@@ -0,0 +1,113 @@
++package nl.hiraku.kyoka;
++
++import com.google.common.base.Preconditions;
++import net.minecraft.server.PacketPlayOutScoreboardDisplayObjective;
++import net.minecraft.server.PacketPlayOutScoreboardObjective;
++import net.minecraft.server.PacketPlayOutScoreboardScore;
++import org.bukkit.Bukkit;
++import org.bukkit.craftbukkit.entity.CraftPlayer;
++import org.bukkit.entity.Player;
++
++import java.util.Arrays;
++
++
++public class KyokaSidebar implements SideBar{
++    private static final String OBJECTIVE_NAME = "KyokaSidebar";
++    private String[] texts = new String[15];
++    private String name = "Sidebar";
++    private boolean hasTicked = false;
++    private CraftPlayer player;
++
++    public KyokaSidebar(CraftPlayer player){
++        this.player = player;
++    }
++    @Override
++    public void addText(String text) {
++        Preconditions.checkState(text.length() < 16);
++        for(int i = 0 ; i < texts.length ; i++){
++            if(texts[i] == null){
++                texts[i] = text;
++                return;
++            }
++        }
++        throw new ArrayIndexOutOfBoundsException("Can not add more than 15 text");
++    }
++
++    @Override
++    public void setText(String text, int position) {
++        if(position < 0 || position > 14){
++            throw new ArrayIndexOutOfBoundsException("position out of bound");
++        }
++        texts[position] = text;
++    }
++
++    @Override
++    public void removeText(int position) {
++        if(position < 0 || position > 14){
++            throw new ArrayIndexOutOfBoundsException("position out of bound");
++        }
++        texts[position] = null;
++    }
++
++    @Override
++    public void setName(String sidebarName) {
++        this.name = sidebarName;
++        update();
++    }
++
++    @Override
++    public String getName() {
++        return name;
++    }
++
++    @Override
++    public void clear() {
++        Arrays.fill(texts , null);
++    }
++
++    @Override
++    public int size() {
++        int count = 0;
++        for(int i = 0 ; i < texts.length ; i++){
++            if(texts[i] != null){
++                count++;
++            }
++        }
++        return count;
++    }
++
++    @Override
++    public void update(){
++        if(hasTicked){
++            PacketPlayOutScoreboardObjective destroyobjective = new PacketPlayOutScoreboardObjective();
++            destroyobjective.a = OBJECTIVE_NAME;
++            destroyobjective.b = name;
++            destroyobjective.c = 1;
++            this.player.getHandle().playerConnection.sendPacket(destroyobjective);
++        }
++        hasTicked = true;
++        PacketPlayOutScoreboardObjective createobjective = new PacketPlayOutScoreboardObjective();
++        createobjective.a = OBJECTIVE_NAME;
++        createobjective.b = name;
++        createobjective.c = 0;
++        player.getHandle().playerConnection.sendPacket(createobjective);
++        PacketPlayOutScoreboardDisplayObjective display = new PacketPlayOutScoreboardDisplayObjective();
++        display.a = 1;
++        display.b = OBJECTIVE_NAME;
++        player.getHandle().playerConnection.sendPacket(display);
++        int count = 15;
++        for(String text : texts){
++            if(text != null) {
++                PacketPlayOutScoreboardScore score = new PacketPlayOutScoreboardScore();
++                score.a = text;
++                score.b = OBJECTIVE_NAME;
++                score.c = count;
++                score.d = 0;
++                player.getHandle().playerConnection.sendPacket(score);
++                count--;
++            }
++        }
++
++    }
++
++}
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+index aca1bbd..22fb48a 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+@@ -1381,6 +1381,18 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+         public void setRevertedHunger(boolean useOldHunger) {
+             craftPlayer.getHandle().revertedHunger = useOldHunger;
+         }
++
++        private nl.hiraku.kyoka.SideBar sidebar;
++        @Override
++        public nl.hiraku.kyoka.SideBar getSideBar() {
++            if(!Bukkit.getKyoka().isEnhancedSidebarAvailable()){
++                throw new IllegalArgumentException("Enhanced Sidebar Disabled By Configuration");
++            }
++            if(sidebar == null){
++                sidebar = new nl.hiraku.kyoka.KyokaSidebar(CraftPlayer.this);
++            }
++            return sidebar;
++        }
+     };
+ 
+     public Kyoka kyoka() {
+diff --git a/src/main/java/org/bukkit/craftbukkit/scoreboard/CraftObjective.java b/src/main/java/org/bukkit/craftbukkit/scoreboard/CraftObjective.java
+index 9eaec71..26288dd 100644
+--- a/src/main/java/org/bukkit/craftbukkit/scoreboard/CraftObjective.java
++++ b/src/main/java/org/bukkit/craftbukkit/scoreboard/CraftObjective.java
+@@ -59,6 +59,9 @@ final class CraftObjective extends CraftScoreboardComponent implements Objective
+ 
+     public void setDisplaySlot(DisplaySlot slot) throws IllegalStateException {
+         CraftScoreboard scoreboard = checkState();
++        if(slot == DisplaySlot.SIDEBAR && org.bukkit.Bukkit.getKyoka().isEnhancedSidebarAvailable()){
++            throw new IllegalArgumentException("Bukkit Sidebar disabled because Enhanced Sidebar is available.");
++        }
+         Scoreboard board = scoreboard.board;
+         ScoreboardObjective objective = this.objective;
+ 
+-- 
+1.9.4.msysgit.2
+

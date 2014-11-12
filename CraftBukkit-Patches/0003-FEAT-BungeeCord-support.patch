@@ -1,4 +1,4 @@
-From 49398d8343e4c6b69aa5fe34a2446fd000d86cf1 Mon Sep 17 00:00:00 2001
+From 3168de49e6cc340316df1a6443a69486b8d0e22d Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Tue, 1 Jul 2014 16:42:39 +1000
 Subject: [PATCH] FEAT: BungeeCord support
@@ -261,7 +261,7 @@ index 6b91be7..e967362 100644
 +    }
  }
 diff --git a/src/main/java/nl/hiraku/kyoka/KyokaConfig.java b/src/main/java/nl/hiraku/kyoka/KyokaConfig.java
-index f5a48c7..3ebbc7c 100644
+index 8351466..aaec0b8 100644
 --- a/src/main/java/nl/hiraku/kyoka/KyokaConfig.java
 +++ b/src/main/java/nl/hiraku/kyoka/KyokaConfig.java
 @@ -14,8 +14,11 @@ public class KyokaConfig {
@@ -276,7 +276,7 @@ index f5a48c7..3ebbc7c 100644
          for (Method method : KyokaConfig.class.getDeclaredMethods()) {
              if (Modifier.isPrivate(method.getModifiers()) && method.getParameterTypes().length == 0 && method.getReturnType().equals(Void.TYPE)) {
                  method.setAccessible(true);
-@@ -34,4 +37,9 @@ public class KyokaConfig {
+@@ -36,4 +39,9 @@ public class KyokaConfig {
          }
  
      }

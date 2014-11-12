@@ -1,4 +1,4 @@
-From ba21ce0e66069fdab8f42a0c5411c61e8b07592c Mon Sep 17 00:00:00 2001
+From 2c5c93d6f77e48a7e50fd116856fe63604e38c0b Mon Sep 17 00:00:00 2001
 From: libhalt <libhalt@libhalt.net>
 Date: Wed, 12 Nov 2014 11:38:29 +0900
 Subject: [PATCH] API: Adds a BarManager for BossBar purpose

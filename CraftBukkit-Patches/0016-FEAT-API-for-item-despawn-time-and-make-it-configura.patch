@@ -1,4 +1,4 @@
-From fef29ac0b164d33d6bf6257fddc259bc7659c365 Mon Sep 17 00:00:00 2001
+From 31a26316b77792c82d2ceddbe2ab64931cf3030e Mon Sep 17 00:00:00 2001
 From: Jamie Shaw <lk@lkay.org>
 Date: Sun, 24 Aug 2014 16:59:28 +1000
 Subject: [PATCH] FEAT: API for item despawn time and make it configurable
@@ -64,7 +64,7 @@ index 834def0..831915c 100644
  
      public void setItemStack(ItemStack itemstack) {
 diff --git a/src/main/java/nl/hiraku/kyoka/KyokaConfig.java b/src/main/java/nl/hiraku/kyoka/KyokaConfig.java
-index 3ebbc7c..f58d9e4 100644
+index aaec0b8..cd546ce 100644
 --- a/src/main/java/nl/hiraku/kyoka/KyokaConfig.java
 +++ b/src/main/java/nl/hiraku/kyoka/KyokaConfig.java
 @@ -15,6 +15,8 @@ public class KyokaConfig {
@@ -76,7 +76,7 @@ index 3ebbc7c..f58d9e4 100644
  
      public static void init() {
          config = YamlConfiguration.loadConfiguration(configFile);
-@@ -42,4 +44,14 @@ public class KyokaConfig {
+@@ -44,4 +46,14 @@ public class KyokaConfig {
          config.addDefault("bungeecord", false);
          bungeecord = config.getBoolean("bungeecord");
      }

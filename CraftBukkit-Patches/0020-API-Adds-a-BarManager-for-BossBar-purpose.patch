@@ -1,14 +1,14 @@
-From 5ed692627a9aaa8726b84ead460175de1785d446 Mon Sep 17 00:00:00 2001
+From 225b451d1c4148cfecdec7d03ad7d71afeae36a5 Mon Sep 17 00:00:00 2001
 From: libhalt <libhalt@libhalt.net>
 Date: Wed, 12 Nov 2014 12:59:31 +0900
 Subject: [PATCH] API: Adds a BarManager for BossBar purpose
 
 
 diff --git a/src/main/java/net/minecraft/server/PlayerList.java b/src/main/java/net/minecraft/server/PlayerList.java
-index dcc3726..8973d0e 100644
+index b7c8445..35ea0c6 100644
 --- a/src/main/java/net/minecraft/server/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/PlayerList.java
-@@ -551,6 +551,7 @@ public abstract class PlayerList {
+@@ -550,6 +550,7 @@ public abstract class PlayerList {
              PlayerChangedWorldEvent event = new PlayerChangedWorldEvent((Player) entityplayer1.getBukkitEntity(), fromWorld);
              Bukkit.getServer().getPluginManager().callEvent(event);
          }

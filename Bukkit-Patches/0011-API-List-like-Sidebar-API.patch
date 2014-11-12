@@ -1,0 +1,68 @@
+From 4d4709c2108df34f5be450ee31f6ddc84853a75c Mon Sep 17 00:00:00 2001
+From: libhalt <libhalt@libhalt.net>
+Date: Wed, 12 Nov 2014 15:02:15 +0900
+Subject: [PATCH] API: List-like Sidebar API
+
+
+diff --git a/src/main/java/nl/hiraku/kyoka/Kyoka.java b/src/main/java/nl/hiraku/kyoka/Kyoka.java
+index 55f51bc..bc12faf 100644
+--- a/src/main/java/nl/hiraku/kyoka/Kyoka.java
++++ b/src/main/java/nl/hiraku/kyoka/Kyoka.java
+@@ -3,4 +3,6 @@ package nl.hiraku.kyoka;
+ public interface Kyoka {
+ 
+     public BarManager getBarManager();
++
++    public boolean isEnhancedSidebarAvailable();
+ }
+diff --git a/src/main/java/nl/hiraku/kyoka/SideBar.java b/src/main/java/nl/hiraku/kyoka/SideBar.java
+new file mode 100644
+index 0000000..6c01f04
+--- /dev/null
++++ b/src/main/java/nl/hiraku/kyoka/SideBar.java
+@@ -0,0 +1,24 @@
++package nl.hiraku.kyoka;
++
++import org.bukkit.entity.Player;
++
++public interface SideBar {
++
++    public void addText(String text);
++
++    public void setText(String text , int position);
++
++    public void removeText(int position);
++
++    public void setName(String sidebarName);
++
++    public String getName();
++
++    public void clear();
++
++    public int size();
++
++    public void update();
++
++}
++
+diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
+index ec58741..92352bb 100644
+--- a/src/main/java/org/bukkit/entity/Player.java
++++ b/src/main/java/org/bukkit/entity/Player.java
+@@ -1086,6 +1086,13 @@ public interface Player extends HumanEntity, Conversable, CommandSender, Offline
+         public void setRevertedHunger(boolean useOldHunger) {
+             throw new UnsupportedOperationException("Not implemented yet.");
+         }
++
++        /**
++         * Gets the Enhanced Sidebar , if available
++         */
++        public nl.hiraku.kyoka.SideBar getSideBar() {
++            throw new UnsupportedOperationException("Not implemented yet.");
++        }
+     }
+ 
+     Kyoka kyoka();
+-- 
+1.9.4.msysgit.2
+
