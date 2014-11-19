@@ -1,4 +1,4 @@
-From 225b451d1c4148cfecdec7d03ad7d71afeae36a5 Mon Sep 17 00:00:00 2001
+From 91ba239094c1c01984793277852b0aafe9a6c743 Mon Sep 17 00:00:00 2001
 From: libhalt <libhalt@libhalt.net>
 Date: Wed, 12 Nov 2014 12:59:31 +0900
 Subject: [PATCH] API: Adds a BarManager for BossBar purpose
@@ -18,10 +18,10 @@ index b7c8445..35ea0c6 100644
          if (entityplayer.playerConnection.isDisconnected()) {
 diff --git a/src/main/java/nl/hiraku/kyoka/KyokaBarManager.java b/src/main/java/nl/hiraku/kyoka/KyokaBarManager.java
 new file mode 100644
-index 0000000..4405804
+index 0000000..9cd0bea
 --- /dev/null
 +++ b/src/main/java/nl/hiraku/kyoka/KyokaBarManager.java
-@@ -0,0 +1,122 @@
+@@ -0,0 +1,125 @@
 +package nl.hiraku.kyoka;
 +
 +import com.google.common.base.Preconditions;
@@ -70,6 +70,9 @@ index 0000000..4405804
 +                    unsetMessage(player);
 +                    return false;
 +                } else {
++                    if(!isBarActive(player)){
++                        setMessageWithValue(player, message, (time / countdown) * 200.0F);
++                    }
 +                    updateMessageWithValue(player, message, (time / countdown) * 200.0F);
 +                }
 +                time--;
@@ -175,5 +178,5 @@ index 31991a3..aca1bbd 100644
      }
  
 -- 
-1.9.4.msysgit.2
+1.9.3 (Apple Git-50)
 
