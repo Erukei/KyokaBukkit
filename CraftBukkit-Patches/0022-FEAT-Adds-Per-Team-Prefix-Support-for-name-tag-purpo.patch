@@ -1,0 +1,82 @@
+From 76dd7b0ae74cfcf37bd17c8c36726818c46e6742 Mon Sep 17 00:00:00 2001
+From: libhalt <libhalt@libhalt.net>
+Date: Fri, 5 Dec 2014 14:00:34 +0900
+Subject: [PATCH] FEAT:Adds Per Team Prefix Support for name-tag purpose
+
+
+diff --git a/src/main/java/net/minecraft/server/PlayerConnection.java b/src/main/java/net/minecraft/server/PlayerConnection.java
+index 48b7b0d..18e6028 100644
+--- a/src/main/java/net/minecraft/server/PlayerConnection.java
++++ b/src/main/java/net/minecraft/server/PlayerConnection.java
+@@ -773,6 +773,21 @@ public class PlayerConnection implements PacketPlayInListener {
+                 copy.obfuscate = false;
+                 packet = copy;
+             }
++        } else if(nl.hiraku.kyoka.KyokaConfig.enablePerTeamPrefixSupport && packet instanceof PacketPlayOutScoreboardTeam){
++            PacketPlayOutScoreboardTeam teamPacket = (PacketPlayOutScoreboardTeam) packet;
++            org.bukkit.scoreboard.Scoreboard score = getPlayer().getScoreboard();
++            org.bukkit.scoreboard.Team team = score.getTeam(teamPacket.a);
++            if(team != null && !team.hasPlayer(getPlayer()) && !teamPacket.c.isEmpty()){
++                PacketPlayOutScoreboardTeam copy = new PacketPlayOutScoreboardTeam();
++                copy.a = teamPacket.a;
++                copy.b = teamPacket.b;
++                copy.c = "";
++                copy.d = teamPacket.d;
++                copy.e = teamPacket.e;
++                copy.f = teamPacket.f;
++                copy.g = teamPacket.g;
++                packet = copy;
++            }
+         }
+         // CraftBukkit end
+ 
+diff --git a/src/main/java/net/minecraft/server/ScoreboardServer.java b/src/main/java/net/minecraft/server/ScoreboardServer.java
+index 1591058..1946885 100644
+--- a/src/main/java/net/minecraft/server/ScoreboardServer.java
++++ b/src/main/java/net/minecraft/server/ScoreboardServer.java
+@@ -29,6 +29,10 @@ public class ScoreboardServer extends Scoreboard {
+     public void handlePlayerRemoved(String s) {
+         super.handlePlayerRemoved(s);
+         this.sendAll(new PacketPlayOutScoreboardScore(s)); // CraftBukkit - Internal packet method
++        ScoreboardTeam team = getPlayerTeam(s);
++        if(team != null){
++            this.handleTeamChanged(team);
++        }
+         this.b();
+     }
+ 
+@@ -60,6 +64,10 @@ public class ScoreboardServer extends Scoreboard {
+             ScoreboardTeam scoreboardteam = this.getTeam(s1);
+ 
+             this.sendAll(new PacketPlayOutScoreboardTeam(scoreboardteam, Arrays.asList(new String[] { s}), 3)); // CraftBukkit - Internal packet method
++            ScoreboardTeam team = getPlayerTeam(s);
++            if(team != null){
++                this.handleTeamChanged(team);
++            }
+             this.b();
+             return true;
+         } else {
+diff --git a/src/main/java/nl/hiraku/kyoka/KyokaConfig.java b/src/main/java/nl/hiraku/kyoka/KyokaConfig.java
+index 33fb7ca..bf222b8 100644
+--- a/src/main/java/nl/hiraku/kyoka/KyokaConfig.java
++++ b/src/main/java/nl/hiraku/kyoka/KyokaConfig.java
+@@ -18,6 +18,7 @@ public class KyokaConfig {
+     public static int itemDespawnTicks;
+     public static int arrowDespawnTicks;
+     public static boolean enhancedSidebarAPI;
++    public static boolean enablePerTeamPrefixSupport;
+ 
+     public static void init() {
+         config = YamlConfiguration.loadConfiguration(configFile);
+@@ -62,4 +63,8 @@ public class KyokaConfig {
+         config.addDefault("enhanced-sidebar-api", false);
+         enhancedSidebarAPI = config.getBoolean("enhanced-sidebar-api");
+     }
++    private static void perTeamColorSupport() {
++        config.addDefault("per-team-prefix-support", true);
++        enhancedSidebarAPI = config.getBoolean("per-team-prefix-support");
++    }
+ }
+-- 
+1.9.3 (Apple Git-50)
+
